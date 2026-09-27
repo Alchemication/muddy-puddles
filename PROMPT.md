@@ -37,6 +37,8 @@ Phones and tablets
 - Swiping anywhere moves Peppa (a tap is not a swipe).
 - Held upright, the arrows go under the field, sized to the screen width.
 - The page never scrolls, zooms or pull-to-refreshes.
+- Sound and music must work on phones too, including an iPhone with its
+  silent switch on.
 
 Peppa
 - Subtly alive: she breathes, blinks and wags her tail, and hops with

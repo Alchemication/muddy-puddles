@@ -39,7 +39,8 @@ The selection page has its own friendly background tune, which starts on the fir
 - **Swipe** anywhere to move Peppa. Small taps are ignored, so only real swipes count. The on-screen arrows can be tapped too.
 - Held upright, the arrows sit under the field and everything is sized to the screen width. Sideways, it uses the same layout as on a computer.
 - The page never scrolls, zooms or pull-to-refreshes while playing.
-- Tip: on iPhone, the silent switch mutes the music and sounds. Adding the page to the Home Screen gives it the whole screen.
+- Sound plays even when an iPhone's silent switch is on, the way video apps do. If the phone was switched to another app, the next tap wakes the sound up again.
+- Tip: on iPhone, adding the page to the Home Screen gives it the whole screen.
 
 ### Peppa
 - She's subtly alive: she breathes, blinks and wags her tail, and hops with swinging legs when she walks.
