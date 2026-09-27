@@ -690,15 +690,22 @@
     // End of a round: a longer run up two octaves.
     fanfare: () => [60, 64, 67, 72, 76, 79, 84].forEach((m, i) =>
       note(hz(m + musicKey), { dur: i === 6 ? 1.2 : 0.4, vol: 0.12, at: i * 0.09 })),
-    // The very end: a bouncy little "muddy puddle dance" over a soft bass.
+    // The very end: the theme one last time, quick and bouncy like a dance,
+    // over a soft bass, landing on a high home note.
     finale: () => {
+      const b = 0.24, root = 48 + musicKey;
       let t = 0;
-      [[12,.5],[16,.5],[19,.5],[24,1],[19,.5],[24,.5],[28,.5],[31,.5],[28,.5],[24,2]].forEach(([n, beats]) => {
-        note(hz(60 + musicKey + n - 12), { dur: 0.5, vol: 0.12, at: t });
-        t += beats * 0.26;
+      SONG.A.bars.forEach((bar, i) => {
+        const chord = CHORDS[SONG.A.chords[i]];
+        note(hz(root - 12 + chord[0]), { dur: b * 1.8, type: "triangle", vol: 0.12, at: t });
+        note(hz(root - 12 + chord[0] + 7), { dur: b * 1.8, type: "triangle", vol: 0.1, at: t + b * 2 });
+        bar.forEach(([n, beats]) => {
+          if (n) note(hz(root + n), { dur: 0.45, vol: 0.12, at: t });
+          t += beats * b;
+        });
       });
-      [[0, 0], [5, 1.04], [7, 2.08], [0, 3.12]].forEach(([n, at]) =>
-        note(hz(36 + musicKey + n), { dur: 1, type: "triangle", vol: 0.12, at }));
+      note(hz(root - 12), { dur: 1.2, type: "triangle", vol: 0.12, at: t });
+      [12, 16, 19, 24].forEach(n => note(hz(root + n), { dur: 1.2, vol: 0.07, at: t }));
     },
   };
 
@@ -723,7 +730,10 @@
       [[24,2],[23,1],[21,1]], [[19,2],[16,2]],
       [[17,1],[19,1],[21,1],[17,1]], [[19,4]] ] },
   };
-  const ORDER = ["A", "B", "A", "C", "D", "B"];
+  // The song grows with the game: level 1 has just the theme (A) and its answer
+  // (B); level 2 adds the other two sections. The finale dances to the theme.
+  const ORDERS = { 1: ["A", "B", "A", "B"], 2: ["A", "B", "A", "C", "D", "B"] };
+  const order = () => ORDERS[state.level] || ORDERS[2];
   const CHORDS = { I: [0, 4, 7], IV: [5, 9, 12], V: [7, 11, 14], vi: [9, 12, 16] };
   // Every muddy puddle moves the song (and the sound effects) to a new key.
   const KEYS = [0, 5, 2, -2];
@@ -751,7 +761,7 @@
   function playTick(at) {
     if (tick === 0 && pendingKey !== null) { musicKey = pendingKey; pendingKey = null; }
     const md = mood(), tone = md.minor ? minorize : n => n;
-    const sec = SONG[ORDER[secIdx]], chord = CHORDS[sec.chords[bar]].map(tone);
+    const sec = SONG[order()[secIdx % order().length]], chord = CHORDS[sec.chords[bar]].map(tone);
     const root = 48 + musicKey, now = Date.now();
     const playing = now - lastMove < 3000, waiting = now - lastMove > 8000;
     const nearPuddle = !state.busy && Math.abs(state.px - state.x) + Math.abs(state.py - state.y) === 1;
@@ -805,7 +815,7 @@
       nextTime += beat * mood().tempo / 2;
       if (++tick === 8) {
         tick = 0;
-        if (++bar === 4) { bar = 0; secIdx = (secIdx + 1) % ORDER.length; }
+        if (++bar === 4) { bar = 0; secIdx = (secIdx + 1) % order().length; }
       }
     }
   }
@@ -1375,7 +1385,7 @@
       state.ready = true;
     }, 6400);
     // The usual music comes back once the dance has finished.
-    setTimeout(() => { if (musicOn && soundOn) startMusic(); }, 8500);
+    setTimeout(() => { if (musicOn && soundOn) startMusic(); }, 10500);
   }
 
   // After the finale, arrows and swipes still make Peppa jump in the big puddle.

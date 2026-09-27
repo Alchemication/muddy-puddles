@@ -39,8 +39,9 @@ Beyond that, be creative and decide the details yourself. Think about what
 would make a toddler smile and keep playing: a Peppa who feels alive,
 satisfying splashes, a world that changes and comes alive as they play, with
 little surprises that are never quite the same twice, and music that reacts
-to what's happening. Keep every effect subtle and in service of learning the
-keys.
+to what's happening. Compose an original, catchy theme with a real melody
+that a child could hum, not just a loop of notes, and let it change as the
+game goes on. Keep every effect subtle and in service of learning the keys.
 
 Finish with a short explanation, for a parent, of how the game works and what
 you added.

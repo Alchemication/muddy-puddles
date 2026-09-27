@@ -103,7 +103,8 @@ Each change fades over about 3 seconds:
 - The **built-in music** is an original four-part tune that reacts to the game:
   - It's calmer while your child is thinking, bouncier while Peppa walks, and twinkly when she's one step from the puddle.
   - It changes key after each puddle and plays a fanfare at the end of each round.
-  - In level 2, a soft beat joins in and the tempo picks up slightly.
+  - The song grows with the game. Level 1 plays just the main theme and its answer. In level 2, two more sections join, along with a soft beat, and the tempo picks up slightly.
+  - The finale plays the main theme one last time, quick and bouncy like a dance.
 - **The music follows the weather.** Cloudy makes it a little slower and softer, with a held chord. Rain makes it dreamy, with little "raindrop" plinks. The storm turns it gently minor and muffled. The rainbow brings a harp run and extra sparkle. Snow makes it slow and twinkly, with bell-like chimes and a falling celesta run as it arrives.
 - Sound effects play in the music's current key, so everything fits together.
 - The 🎵 button turns music on and off. It only responds to the mouse, so key-mashing can't switch it off.
