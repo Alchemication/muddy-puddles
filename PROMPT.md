@@ -9,9 +9,10 @@ files, libraries, images or audio files) that teaches a toddler (3-4 years old) 
 The idea
 - Peppa walks around a field, one step per arrow key, to jump into muddy
   puddles. Each puddle is a small celebration, then a new one appears.
-- Start with just left and right, and add up and down once my child is ready.
+- Two levels of 5 puddles each. Level 1 is a single row, so only left and
+  right are needed. Level 2 is a bigger field where up and down join in.
 - It also works on phones and tablets by swiping.
-- The game has an end; it doesn't go on forever. After the last puddle,
+- The game has an end; it doesn't go on forever. After the 10th puddle,
   finish with a big, super-muddy celebration, and quietly show how long it
   took (just for fun, never a score to beat). When the celebration is over,
   show a button to play again.
