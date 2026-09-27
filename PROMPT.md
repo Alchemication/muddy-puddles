@@ -57,8 +57,7 @@ Sound and music
   rainbow appears.
 - Sound effects fit in the music's current key.
 - The music gets quieter whenever the voice speaks.
-- Add a small music on/off button that only responds to the mouse, and let
-  me drop in my own music.mp3 to replace the built-in tune.
+- Add a small music on/off button that only responds to the mouse.
 ```
 
 ## Scorecard (1 point each, 22 total)
@@ -100,7 +99,7 @@ Sound and music
 18. The music's mood follows the weather
 19. Sound effects are in the music's key
 20. The music gets quieter when the voice speaks
-21. The mouse-only music button works, and `music.mp3` is used if it's present
+21. The mouse-only music button turns the music on and off
 
 **Overall**
 

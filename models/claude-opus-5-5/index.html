@@ -409,11 +409,8 @@
   };
 
   // ---------- Background music ----------
-  // If a music.mp3 file sits next to this page, it plays that on a loop.
-  // Otherwise it plays a short original tune built into the page.
-  const musicFile = new Audio("music.mp3");
-  musicFile.loop = true;
-  let useFile = false, musicOn = true, musicTimer = null;
+  // An original tune built into the page, no audio files needed.
+  let musicOn = true, musicTimer = null;
 
   // Original song in four 4-bar sections, played in a varied order.
   // Melody notes are semitones above the key's root (12 = middle of the tune), 0 = rest.
@@ -515,23 +512,17 @@
   }
   function startMusic() {
     if (!musicOn) return;
-    if (useFile) { musicFile.play().catch(() => {}); return; }
     audio();
     nextTime = ctx.currentTime + 0.1;
     clearInterval(musicTimer);
     musicTimer = setInterval(scheduleMusic, 100);
   }
   function stopMusic() {
-    musicFile.pause();
     clearInterval(musicTimer);
   }
   function setMusicLevel(level) {
-    musicFile.volume = level;
     if (musicBus) musicBus.gain.setTargetAtTime(level, ctx.currentTime, 0.15);
   }
-  musicFile.volume = MUSIC_VOLUME;
-  musicFile.addEventListener("canplay", () => { useFile = true; }, { once: true });
-  musicFile.load();
 
   // Music gets quieter while the voice is talking.
   function say(text) {

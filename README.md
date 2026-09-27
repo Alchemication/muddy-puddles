@@ -55,7 +55,6 @@ The weather moves one step after each puddle: ☀️ sunny → ⛅ cloudy → �
 - Sound effects play in the music's current key, so everything fits together.
 - The music gets quieter whenever the voice speaks.
 - The 🎵 button turns music on and off. It only responds to the mouse, so key-mashing can't switch it off.
-- To use your own background music, put a `music.mp3` next to that model's `index.html`. It's git-ignored, so it's never committed.
 
 ## Adding a new model
 
