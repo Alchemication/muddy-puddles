@@ -52,6 +52,23 @@
   #stars { position: absolute; z-index: 2; right: 3vw; top: 3vh; font-size: 7vh; letter-spacing: .5vw; }
   .star { display: inline-block; animation: pop .5s ease-out; }
 
+  /* ---------- Scenery: soft parallax layers behind the field ---------- */
+  #scenery { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+  .scene { position: absolute; inset: 0; transition: opacity 2.5s ease-in-out; }
+  .scene .layer {
+    position: absolute; left: -15%; top: 0; width: 130%; overflow: visible;
+    transition: transform 1.1s cubic-bezier(.25, .1, .25, 1);
+  }
+  .scene .layer.near { height: 100%; opacity: .6; }
+  .scene path, .scene circle, .scene rect { transition: fill 3s, stroke 3s; }
+
+  /* Devices set to reduce motion: no drifting or sliding at all. */
+  @media (prefers-reduced-motion: reduce) {
+    .scene .layer { transition: none; }
+    .cloud { animation: none; }
+    .raindrop { animation-duration: 4s; }
+  }
+
   /* ---------- Weather ----------
      Moves one step after each puddle: sunny → cloudy → rain → rainbow → sunny.
      Everything fades slowly so it never distracts from the game. */
@@ -100,7 +117,7 @@
   /* ---------- Main area ---------- */
   #main { flex: 1; display: flex; min-height: 0; }
   #field {
-    flex: 1; position: relative; overflow: hidden;
+    flex: 1; position: relative; overflow: hidden; isolation: isolate;
     background: var(--grass);
     border-top-right-radius: 4vh;
     transition: background-color 3s;
@@ -315,6 +332,7 @@
   </div>
   <div id="main">
     <div id="field">
+      <div id="scenery"></div>
       <div id="rain"></div>
       <div id="puddle">
         <svg viewBox="0 0 200 100">
@@ -646,6 +664,102 @@
     el.style.left = offX + x * cell + (cell - size) / 2 + "px";
     el.style.top = offY + y * cell + (cell - size) / 2 + "px";
   }
+  // ---------- Scenery ----------
+  // Three soft layers: hazy far hills, a nearer rolling horizon with a few
+  // trees, and grass tufts and flowers over the field. When Peppa walks they
+  // slide a little, far ones least, for gentle depth. Each round gets a newly
+  // generated landscape that cross-fades in. Colours mix from the sky and grass
+  // colours, so they stay pastel and follow the weather.
+  const scenery = $("#scenery");
+  const PARALLAX = { far: 0.025, mid: 0.05, near: 0.09 }; // share of the field's width, edge to edge
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let sceneSeed = Math.floor(Math.random() * 1e9), sceneFade = false;
+
+  function seeded(seed) { // small repeatable random generator (mulberry32)
+    return () => {
+      seed = (seed + 0x6D2B79F5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function layerShift(depth) {
+    if (reduceMotion) return "none";
+    const k = PARALLAX[depth], w = field.clientWidth;
+    const px = state.cols > 1 ? state.x / (state.cols - 1) - 0.5 : 0;
+    const py = state.rows > 1 ? state.y / (state.rows - 1) - 0.5 : 0;
+    // Only the near layer moves up and down, so the horizon never shows a gap.
+    return `translate(${(-px * k * w).toFixed(1)}px, ${depth === "near" ? (-py * k * w * 0.3).toFixed(1) : 0}px)`;
+  }
+  function parallax() {
+    scenery.querySelectorAll(".layer").forEach(l => { l.style.transform = layerShift(l.dataset.depth); });
+  }
+  function renderScenery() {
+    const W = Math.round(field.clientWidth * 1.3), H = field.clientHeight;
+    const rand = seeded(sceneSeed), between = (a, b) => a + rand() * (b - a);
+    // The horizon sits in the space above the top row of spots.
+    const band = Math.min(Math.max(offY * 0.9, H * 0.07), H * 0.3), bandH = band * 1.1;
+    const wave = (base, amp) => {
+      const f1 = between(1.5, 3) * 2 * Math.PI / W, f2 = between(4, 7) * 2 * Math.PI / W;
+      const p1 = rand() * 7, p2 = rand() * 7, amp2 = amp * between(0.2, 0.4);
+      return x => base + amp * Math.sin(x * f1 + p1) + amp2 * Math.sin(x * f2 + p2);
+    };
+    const outline = (fn, bottom) => {
+      let d = `M0 ${bottom} L0 ${fn(0).toFixed(1)}`;
+      for (let x = 12; x <= W + 12; x += 12) d += ` L${x} ${fn(x).toFixed(1)}`;
+      return d + ` L${W + 12} ${bottom} Z`;
+    };
+    const far = wave(band * 0.45, band * 0.22), mid = wave(band * 0.85, band * 0.12);
+    const haze = Math.round(between(42, 60));
+    const layer = (depth, h, body) =>
+      `<svg class="layer ${depth}" data-depth="${depth}" style="transform: ${layerShift(depth)}" viewBox="0 0 ${W} ${h}"
+        width="${W}" height="${h}" preserveAspectRatio="none">${body}</svg>`;
+
+    let trees = "";
+    for (let i = 0, n = 2 + Math.floor(rand() * 3); i < n; i++) {
+      const x = between(0.08, 0.92) * W, y = mid(x) + 2, size = band * between(0.22, 0.34);
+      const leaf = Math.round(between(55, 72));
+      trees += `<rect x="${x - size * 0.06}" y="${y - size * 0.45}" width="${size * 0.12}" height="${size * 0.5}" rx="${size * 0.04}" style="fill: #b29a80"/>`
+        + `<circle cx="${x}" cy="${y - size * 0.7}" r="${size * 0.38}" style="fill: color-mix(in srgb, var(--grass) ${leaf}%, #3d6b36)"/>`
+        + `<circle cx="${x - size * 0.22}" cy="${y - size * 0.52}" r="${size * 0.26}" style="fill: color-mix(in srgb, var(--grass) ${leaf + 10}%, #3d6b36)"/>`;
+    }
+    let near = "";
+    const FLOWERS = ["#f6c3d6", "#fbe9a6", "#ffffff", "#dccaf2"];
+    for (let i = 0, n = Math.round(W / 70); i < n; i++) {
+      const x = rand() * W, y = between(bandH + 10, H - 6);
+      if (rand() < 0.6) {
+        const t = between(6, 11);
+        near += `<path d="M${x - t * 0.5} ${y} l${t * 0.3} ${-t} M${x} ${y} l0 ${-t * 1.2} M${x + t * 0.5} ${y} l${-t * 0.3} ${-t}"
+          style="fill: none; stroke: color-mix(in srgb, var(--grass) 70%, #3d6b36)" stroke-width="2" stroke-linecap="round"/>`;
+      } else {
+        near += `<circle cx="${x}" cy="${y}" r="${between(3, 4.5)}" style="fill: ${FLOWERS[Math.floor(rand() * FLOWERS.length)]}"/>`
+          + `<circle cx="${x}" cy="${y}" r="1.4" style="fill: #f2cf6b"/>`;
+      }
+    }
+
+    const scene = document.createElement("div");
+    scene.className = "scene";
+    scene.innerHTML =
+      layer("far", bandH, `<rect width="${W}" height="${bandH}" style="fill: var(--sky)"/>
+        <path d="${outline(far, bandH)}" style="fill: color-mix(in srgb, var(--grass) ${haze}%, var(--sky))"/>`) +
+      // The horizon's grass runs a little past its edge, so it meets the field without a seam.
+      layer("mid", bandH, `<path d="${outline(mid, bandH + 8)}" style="fill: var(--grass)"/>${trees}`) +
+      layer("near", H, near);
+
+    const old = [...scenery.children];
+    if (sceneFade && old.length) { // a new round: cross-fade to the new landscape
+      scene.style.opacity = 0;
+      scenery.append(scene);
+      scene.offsetWidth;
+      scene.style.opacity = 1;
+      setTimeout(() => old.forEach(o => o.remove()), 2700);
+    } else {
+      old.forEach(o => o.remove());
+      scenery.append(scene);
+    }
+    sceneFade = false;
+  }
+
   function layout() {
     const w = field.clientWidth, h = field.clientHeight;
     cell = Math.min(w / state.cols, h / state.rows);
@@ -666,6 +780,7 @@
     peppa.style.transition = "";
     keyEls.up.classList.toggle("off", state.rows === 1);
     keyEls.down.classList.toggle("off", state.rows === 1);
+    renderScenery();
   }
 
   // ---------- Game ----------
@@ -704,6 +819,7 @@
     }
     state.x = nx; state.y = ny;
     place(peppa, nx, ny, 0.85);
+    parallax();
     replay(peppa, "walking");
     clearTimeout(walkTimer);
     walkTimer = setTimeout(() => peppa.classList.remove("walking"), 400); // back to breathing
@@ -751,6 +867,8 @@
     } else {
       message.textContent = "Well done! 🌈";
     }
+    sceneSeed = Math.floor(Math.random() * 1e9); // a new landscape for the new round
+    sceneFade = true;
     layout();
     setTimeout(() => { newPuddle(); state.busy = false; }, 2500);
   }

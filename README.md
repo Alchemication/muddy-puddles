@@ -54,6 +54,13 @@ When Peppa lands in the puddle, it squishes, ripples spread out and mud drops ar
 - **Rain:** the puddle fills up and gets little raindrop rings. The splash is bigger and wetter, with a deeper bloop.
 - **Rainbow:** a faint rainbow sheen on the puddle, and some drops twinkle in rainbow colours ✨.
 
+### Background
+- A soft **parallax** landscape sits behind the field: hazy far hills, a nearer horizon with a few trees, and grass tufts and little flowers.
+- When Peppa walks, the layers slide slightly, far ones least, which gives gentle depth.
+- The landscape is **generated**, so every game looks a little different, and each new round cross-fades to a new one.
+- Its colours are mixed from the sky and grass colours, so it stays pastel and follows the weather.
+- Devices set to reduce motion get no sliding and no drifting clouds.
+
 ### Weather
 The weather moves one step after each puddle: ☀️ sunny → ⛅ cloudy → 🌧️ light rain → 🌈 rainbow → ☀️ sunny. Each change fades over about 3 seconds:
 - The sky and grass change colour.

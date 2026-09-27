@@ -5,8 +5,10 @@ Every game in this repo is generated from this prompt in a single shot: one mess
 ```
 Build a Peppa Pig game as a single self-contained HTML file (no external
 files, libraries or audio files) that teaches my 2-year-old the arrow keys.
-Keep it large, simple and clear. Draw Peppa yourself and compose original
-music; don't copy the show's artwork or theme tune.
+Keep it large, simple and clear, and gentle on young eyes: soft pastel
+colours, low contrast, nothing flashing or fast, and no motion for devices set
+to reduce motion. Draw Peppa yourself and compose original music; don't copy
+the show's artwork or theme tune.
 
 Gameplay
 - The arrow keys walk Peppa one step at a time across a grassy field to a
@@ -46,6 +48,13 @@ Peppa
 - After a splash she cheers with her arms up and gets mud spots that fade by
   the next puddle.
 - In the rain she looks up at the sky now and then.
+
+Background
+- A soft parallax landscape behind the field: hazy far hills, a nearer
+  horizon with a few trees, and grass tufts and flowers. When Peppa walks,
+  the layers slide slightly, far ones least.
+- It is generated, so every game and every new round looks a little
+  different; a new landscape cross-fades in.
 
 Weather
 - It moves one step per puddle, never mid-move: sunny, cloudy, light rain,
