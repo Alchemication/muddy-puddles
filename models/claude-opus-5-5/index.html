@@ -22,6 +22,7 @@
   html, body {
     margin: 0; height: 100%; overflow: hidden;
     background: var(--sky); color: var(--text);
+    transition: background-color 3s;
     font-family: "Chalkboard SE", "Comic Sans MS", "Marker Felt", system-ui, sans-serif;
     user-select: none; -webkit-user-select: none;
   }
@@ -29,7 +30,7 @@
 
   /* ---------- Sky ---------- */
   #sky {
-    flex: 0 0 16vh; position: relative;
+    flex: 0 0 16vh; position: relative; overflow: hidden;
     display: flex; align-items: center; justify-content: center; gap: 3vw;
   }
   #sun {
@@ -38,14 +39,59 @@
     background: #ffe04a; box-shadow: 0 0 0 1.5vh #fff2a8;
   }
   #music {
-    position: absolute; left: 17vh; top: 4vh;
+    position: absolute; left: 17vh; top: 4vh; z-index: 2;
     width: 7vh; height: 7vh; border: none; border-radius: 50%;
     background: rgba(255,255,255,.6); font-size: 3.5vh; cursor: pointer;
   }
   #music.muted { opacity: .35; }
-  #message { font-size: 6vh; font-weight: bold; text-align: center; }
-  #stars { position: absolute; right: 3vw; top: 3vh; font-size: 7vh; letter-spacing: .5vw; }
+  #message { position: relative; z-index: 2; font-size: 6vh; font-weight: bold; text-align: center; }
+  #stars { position: absolute; z-index: 2; right: 3vw; top: 3vh; font-size: 7vh; letter-spacing: .5vw; }
   .star { display: inline-block; animation: pop .5s ease-out; }
+
+  /* ---------- Weather ----------
+     Moves one step after each puddle: sunny → cloudy → rain → rainbow → sunny.
+     Everything fades slowly so it never distracts from the game. */
+  body[data-weather="cloudy"]  { --sky: #a9c9dd; }
+  body[data-weather="rain"]    { --sky: #9db4c4; --grass: #5ca83f; --grass-dot: #6bb84c; }
+  body[data-weather="rainbow"] { --sky: #99d7ff; --grass: #66bf46; --grass-dot: #78cd57; }
+  #sun { transition: opacity 3s, filter 3s; }
+  body[data-weather="rain"] #sun { opacity: .45; filter: saturate(.5); }
+  .cloud {
+    position: absolute; left: 0; z-index: 1; pointer-events: none;
+    animation: drift linear infinite;
+    transition: opacity 3s, filter 3s;
+  }
+  .cloud svg { width: 100%; height: auto; display: block; }
+  .cloud.extra { opacity: 0; }
+  body[data-weather="cloudy"] .cloud.extra, body[data-weather="rain"] .cloud.extra { opacity: .95; }
+  body[data-weather="rain"] .cloud { filter: brightness(.9); }
+  #suncloud {
+    position: absolute; left: calc(3vw + 2vh); top: 5vh; width: 15vh; z-index: 1;
+    opacity: 0; transition: opacity 3s, filter 3s;
+  }
+  body[data-weather="cloudy"] #suncloud { opacity: .9; }
+  body[data-weather="rain"] #suncloud { opacity: 1; filter: brightness(.9); }
+  #rainbow {
+    position: absolute; left: 50%; bottom: -1vh; width: 56vw; height: 15vh;
+    transform: translateX(-50%); z-index: 0; pointer-events: none;
+    background: radial-gradient(ellipse 50% 100% at 50% 100%,
+      transparent 72%, #c39bff 72% 76%, #7cc0ff 76% 80%, #8fd694 80% 84%,
+      #fff38a 84% 88%, #ffc27a 88% 92%, #ff9a9a 92% 96%, transparent 96%);
+    opacity: 0; transition: opacity 4s;
+  }
+  body[data-weather="rainbow"] #rainbow { opacity: .55; }
+  #rain {
+    position: absolute; inset: 0; z-index: 4; pointer-events: none;
+    opacity: 0; transition: opacity 2.5s;
+  }
+  body[data-weather="rain"] #rain { opacity: 1; }
+  .raindrop {
+    position: absolute; top: -6vh; width: .35vh; height: 3.5vh; border-radius: .2vh;
+    background: rgba(255, 255, 255, .55);
+    animation: fall linear infinite;
+  }
+  @keyframes drift { from { transform: translateX(-25vw); } to { transform: translateX(110vw); } }
+  @keyframes fall { to { transform: translate(-4vh, 95vh); } }
 
   /* ---------- Main area ---------- */
   #main { flex: 1; display: flex; min-height: 0; }
@@ -53,10 +99,12 @@
     flex: 1; position: relative; overflow: hidden;
     background: var(--grass);
     border-top-right-radius: 4vh;
+    transition: background-color 3s;
   }
   .tile {
     position: absolute; border-radius: 50%;
     background: var(--grass-dot);
+    transition: background-color 3s;
   }
   #puddle {
     position: absolute; transition: opacity .3s;
@@ -169,6 +217,7 @@
 
 <div id="game">
   <div id="sky">
+    <div id="rainbow"></div>
     <div id="sun"></div>
     <button id="music" aria-label="Music on/off" tabindex="-1">🎵</button>
     <div id="message">Find the muddy puddle!</div>
@@ -176,6 +225,7 @@
   </div>
   <div id="main">
     <div id="field">
+      <div id="rain"></div>
       <div id="puddle">
         <svg viewBox="0 0 200 100">
           <ellipse cx="100" cy="55" rx="95" ry="40" fill="var(--mud)"/>
@@ -244,6 +294,38 @@
   const $ = s => document.querySelector(s);
   const field = $("#field"), peppa = $("#peppa"), puddle = $("#puddle");
   const message = $("#message"), stars = $("#stars");
+
+  // ---------- Weather ----------
+  // One step after each puddle, so it changes with progress, never mid-thought.
+  const WEATHER = ["sunny", "cloudy", "rain", "rainbow", "sunny"];
+  function setWeather() { document.body.dataset.weather = WEATHER[state.score % WEATHER.length]; }
+  const CLOUD_SVG = `<svg viewBox="0 0 100 50"><g fill="#fff">
+    <circle cx="30" cy="30" r="17"/><circle cx="54" cy="22" r="21"/><circle cx="76" cy="31" r="14"/>
+    <rect x="18" y="30" width="70" height="18" rx="9"/></g></svg>`;
+  (function buildWeather() {
+    const sky = $("#sky");
+    // [top, width, seconds to cross, extra = only when cloudy or raining]
+    [[1, 13, 95, false], [6, 10, 120, false], [0, 16, 80, true], [5, 12, 105, true], [2, 14, 90, true]]
+      .forEach(([top, width, secs, extra], i) => {
+        const c = document.createElement("div");
+        c.className = "cloud" + (extra ? " extra" : "");
+        c.innerHTML = CLOUD_SVG;
+        Object.assign(c.style, { top: top + "vh", width: width + "vh",
+          animationDuration: secs + "s", animationDelay: -(secs * (i * 0.21 + 0.1)) + "s" });
+        sky.append(c);
+      });
+    const sunCloud = document.createElement("div");
+    sunCloud.id = "suncloud"; sunCloud.innerHTML = CLOUD_SVG;
+    sky.append(sunCloud);
+    const rain = $("#rain");
+    for (let i = 0; i < 34; i++) {
+      const d = document.createElement("div"), dur = 0.9 + Math.random() * 0.5;
+      d.className = "raindrop";
+      Object.assign(d.style, { left: Math.random() * 105 + "%",
+        animationDuration: dur + "s", animationDelay: -Math.random() * dur + "s" });
+      rain.append(d);
+    }
+  })();
   const keyEls = Object.fromEntries([...document.querySelectorAll(".key")].map(k => [k.dataset.dir, k]));
 
   // Level 1: one row, only left/right. Level 2: three rows, all four arrows.
@@ -519,6 +601,7 @@
 
     setTimeout(() => {
       puddle.style.opacity = 0;
+      setWeather();
       if (state.score % PUDDLES_PER_ROUND === 0) roundDone();
       else { newPuddle(); state.busy = false; }
     }, 1800);
@@ -648,6 +731,7 @@
     musicOn ? startMusic() : stopMusic();
   });
   window.addEventListener("resize", layout);
+  setWeather();
   layout();
 })();
 </script>
