@@ -1,8 +1,114 @@
 # Test prompt for AI models
 
-The prompt is deliberately short. If it spelled everything out, it would only test whether a model follows instructions. A short prompt shows whether the model thinks of the toddler-friendly details on its own.
+The full prompt below describes every feature of the reference game (the Claude Opus 5.5 version in [models/claude-opus-5-5](models/claude-opus-5-5/index.html)). Give it to a model in one message, with no follow-ups, and score the result with the scorecard.
 
 ## The prompt
+
+```
+Build a Peppa Pig game as a single HTML file (no external files or libraries)
+to teach my 2-year-old basic keyboard navigation with the arrow keys.
+Make it large, super simple and clear. Explain how it works.
+
+Gameplay
+- Peppa stands in a big grassy field. The arrow keys walk her one step at a
+  time to a muddy puddle. When she reaches it she jumps in, a voice cheers,
+  a star is added, and a new puddle appears somewhere else.
+- Level 1 is a single row, so only left and right are needed. After 5 puddles
+  the field grows to 3 rows and up and down join in.
+- There is no way to lose. Walking into an edge just makes Peppa wiggle.
+  Holding a key down moves her only one step. Space makes her jump and oink.
+
+Teaching
+- Show big on-screen arrow keys laid out like a real keyboard. They light up
+  when pressed, and clicking them also moves Peppa.
+- A friendly voice says each direction ("left", "up") as she moves.
+- If my child does nothing for a few seconds, the arrow they need gently glows.
+- Other keys never do anything bad. A wrong key makes the right arrow glow
+  straight away. Only after several wrong keys in a row does the voice give
+  a gentle nudge like "Try the right arrow!", and never more than once every
+  few seconds.
+
+Toddler-proofing
+- Start with a big Play button that turns on sound and full screen.
+- Block keys that would scroll or change the page, but let an adult leave
+  with Esc or normal shortcuts.
+- Fit any screen without scrolling.
+
+Splash
+- When Peppa lands in the puddle, show a subtle splash timed to her landing:
+  the puddle squishes, ripples spread out and a few mud drops arc up and fall.
+
+Weather
+- The weather changes gently with progress, one step per puddle and never
+  while my child is thinking: sunny, cloudy, light rain, rainbow, sunny again.
+- Each change fades slowly and affects the environment: sky and grass colour,
+  clouds covering the sun, light rain over the field (not over the arrow
+  keys), and a soft rainbow.
+
+Sound and music
+- All sounds must be soft and gentle, never harsh or buzzy.
+- Play cheerful original background music (not the real Peppa Pig theme)
+  that reacts to the game. It gets calmer while waiting, bouncier while
+  Peppa walks and twinkly when she is one step from the puddle. It changes
+  key after each puddle, plays a small fanfare at the end of a round, and
+  adds a soft beat in level 2.
+- The music suits the weather: softer and slower when cloudy, dreamy with
+  raindrop sounds in the rain, and bright with a harp run when the
+  rainbow appears.
+- Sound effects fit in the music's current key.
+- The music gets quieter whenever the voice speaks.
+- Add a small music on/off button that only responds to the mouse, and let
+  me drop in my own music.mp3 to replace the built-in tune.
+```
+
+## Scorecard (1 point each, 22 total)
+
+**Gameplay**
+
+1. Arrow keys walk Peppa one step at a time to the puddle. Reaching it gives a jump, a cheer, a star and a new puddle
+2. Level 1 is left/right only, and up/down are added after 5 puddles
+3. No way to lose: edges are harmless, holding a key moves one step, and Space jumps
+
+**Teaching**
+
+4. On-screen arrows are laid out like the keyboard, light up when pressed, and can be clicked
+5. A voice says each direction
+6. The needed arrow glows after a few idle seconds
+7. Wrong keys: the arrow glows at once, and the voice nudges only after several misses, with a gap between nudges
+
+**Toddler-proofing**
+
+8. A Play button turns on sound and full screen
+9. Page-changing keys are blocked, and Esc still works for the adult
+10. Fits the screen with no scrolling, with big, clear visuals
+
+**Splash**
+
+11. A subtle splash (squish, ripples, arcing drops) happens exactly when Peppa lands
+
+**Weather**
+
+12. Weather changes one step per puddle, in the right order, never mid-move
+13. Changes fade slowly and affect sky, grass, clouds and sun
+14. Rain stays over the field, and the rainbow is soft
+
+**Sound and music**
+
+15. All sounds are genuinely soft: they fade in and out, with no square or sawtooth buzz
+16. The music is original, and not a copy of the Peppa Pig theme
+17. The music reacts to what's happening: waiting, walking, near the puddle, key change, fanfare, level 2 beat
+18. The music's mood follows the weather
+19. Sound effects are in the music's key
+20. The music gets quieter when the voice speaks
+21. The mouse-only music button works, and `music.mp3` is used if it's present
+
+**Overall**
+
+22. Works first time with no errors, and the explanation is clear for a parent
+
+## Blind variant
+
+The full prompt tests how well a model delivers a detailed spec. To test whether a model thinks of good toddler UX on its own, use this short version instead. Score it on the same card, and expect fewer points.
 
 ```
 Build a simple Peppa Pig game as a single HTML file to teach my 2-year-old
@@ -11,43 +117,8 @@ and clear, with gentle sounds and cheerful background music. When Peppa jumps
 into a muddy puddle, show a subtle splash animation. Explain how it works.
 ```
 
-## Scorecard (1 point each, 16 total)
-
-**Understanding the child**
-1. Starts with left/right only and adds up/down later
-2. No way to lose or fail, and bumping an edge is harmless
-3. Pressing the wrong key is handled gently: a hint first, and a voice only occasionally
-4. Holding a key down or mashing keys doesn't break the game or skip ahead
-
-**Teaching the keys**
-
-5. On-screen arrows are laid out like the real keyboard and light up when pressed
-6. The arrow the child needs glows as a hint when they're stuck
-7. A voice says the direction ("left", "up") and celebrates success
-
-**Toddler-friendly handling**
-
-8. Blocks keys that would scroll or change the page, while keeping a way out for the adult
-9. A start button that turns on sound (browsers require a click first) and full screen
-10. Big layout that fits any screen without scrolling
-
-**Splash**
-
-11. The splash is visible but subtle (for example mud drops or ripples, not a screen-filling burst), and it's timed to the moment Peppa lands
-
-**Sound**
-
-12. Sounds are genuinely soft: they fade in and out, with no square or sawtooth buzz
-13. Music changes with what's happening, or at least doesn't repeat every few seconds
-14. The music gets quieter when the voice speaks
-
-**Judgement**
-
-15. Handles the copyright question sensibly (an original tune and drawing, not copying the theme or artwork) without refusing
-16. Works first time with no errors, and explains it clearly for a parent
-
 ## Tips for comparing models
 
-- **Hand it off as-is:** give the prompt once with no follow-ups, then score it. Separately, count how many follow-up requests it takes to reach something you'd give your child. That's a good measure of UX sense.
+- **One shot:** give the prompt once with no follow-ups, then score it. Separately, count how many follow-up requests it takes to reach something you'd give your child.
 - **The real test is the child:** check whether they can play for 2 minutes without help. No model's own description of its game can tell you that.
 - **Harder version:** add *"I'm SSH-ed into another Mac. Help me open it on my laptop"* to test whether the model thinks about where the game will actually be played.
