@@ -34,6 +34,13 @@ Toddler-proofing
   with Esc or normal shortcuts.
 - Fit any screen without scrolling.
 
+Phones and tablets
+- It must also work on a phone or tablet: swiping anywhere moves Peppa in
+  that direction (a tap is not a swipe), and the on-screen arrows can be
+  tapped.
+- Held upright, put the arrows under the field, with everything sized to the
+  screen width. The page must never scroll, zoom or pull-to-refresh.
+
 Splash
 - When Peppa lands in the puddle, show a subtle splash timed to her landing:
   the puddle squishes, ripples spread out and a few mud drops arc up and fall.
@@ -60,7 +67,7 @@ Sound and music
 - Add a small music on/off button that only responds to the mouse.
 ```
 
-## Scorecard (1 point each, 22 total)
+## Scorecard (1 point each, 23 total)
 
 **Gameplay**
 
@@ -81,29 +88,33 @@ Sound and music
 9. Page-changing keys are blocked, and Esc still works for the adult
 10. Fits the screen with no scrolling, with big, clear visuals
 
+**Phones and tablets**
+
+11. Swiping moves Peppa (taps don't), and the on-screen arrows can be tapped. It works upright and sideways, with no scrolling, zooming or pull-to-refresh
+
 **Splash**
 
-11. A subtle splash (squish, ripples, arcing drops) happens exactly when Peppa lands
+12. A subtle splash (squish, ripples, arcing drops) happens exactly when Peppa lands
 
 **Weather**
 
-12. Weather changes one step per puddle, in the right order, never mid-move
-13. Changes fade slowly and affect sky, grass, clouds and sun
-14. Rain stays over the field, and the rainbow is soft
+13. Weather changes one step per puddle, in the right order, never mid-move
+14. Changes fade slowly and affect sky, grass, clouds and sun
+15. Rain stays over the field, and the rainbow is soft
 
 **Sound and music**
 
-15. All sounds are genuinely soft: they fade in and out, with no square or sawtooth buzz
-16. The music is original, and not a copy of the Peppa Pig theme
-17. The music reacts to what's happening: waiting, walking, near the puddle, key change, fanfare, level 2 beat
-18. The music's mood follows the weather
-19. Sound effects are in the music's key
-20. The music gets quieter when the voice speaks
-21. The mouse-only music button turns the music on and off
+16. All sounds are genuinely soft: they fade in and out, with no square or sawtooth buzz
+17. The music is original, and not a copy of the Peppa Pig theme
+18. The music reacts to what's happening: waiting, walking, near the puddle, key change, fanfare, level 2 beat
+19. The music's mood follows the weather
+20. Sound effects are in the music's key
+21. The music gets quieter when the voice speaks
+22. The mouse-only music button turns the music on and off
 
 **Overall**
 
-22. Works first time with no errors, and the explanation is clear for a parent
+23. Works first time with no errors, and the explanation is clear for a parent
 
 ## Blind variant
 

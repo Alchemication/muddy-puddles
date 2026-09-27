@@ -35,6 +35,12 @@ The selection page has its own friendly background tune, which starts on the fir
 - Keys that would scroll or change the page are blocked. Esc and normal shortcuts still work for adults.
 - The layout fits any screen without scrolling.
 
+### Phones and tablets
+- **Swipe** anywhere to move Peppa. Small taps are ignored, so only real swipes count. The on-screen arrows can be tapped too.
+- Held upright, the arrows sit under the field and everything is sized to the screen width. Sideways, it uses the same layout as on a computer.
+- The page never scrolls, zooms or pull-to-refreshes while playing.
+- Tip: on iPhone, the silent switch mutes the music and sounds. Adding the page to the Home Screen gives it the whole screen.
+
 ### Splash
 When Peppa lands in the puddle, it squishes, two ripples spread out and mud drops arc up and fall back. It's timed to her landing, together with a soft "bloop" and a rising chime.
 
@@ -67,4 +73,4 @@ The weather moves one step after each puddle: ☀️ sunny → ⛅ cloudy → �
 [PROMPT.md](PROMPT.md) has:
 - A **full prompt** describing every feature above, for testing how well a model delivers a detailed spec in one go.
 - A **blind** short variant, for testing whether a model thinks of good toddler UX on its own.
-- A **22-point scorecard** that works for both.
+- A **23-point scorecard** that works for both.

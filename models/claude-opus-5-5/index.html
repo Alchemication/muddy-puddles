@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <title>Peppa's Muddy Puddles</title>
 <style>
   :root {
@@ -21,6 +23,8 @@
   }
   html, body {
     margin: 0; height: 100%; overflow: hidden;
+    /* Phones: no scrolling, zooming or pull-to-refresh, so swipes only move Peppa. */
+    touch-action: none; overscroll-behavior: none; -webkit-touch-callout: none;
     background: var(--sky); color: var(--text);
     transition: background-color 3s;
     font-family: "Chalkboard SE", "Comic Sans MS", "Marker Felt", system-ui, sans-serif;
@@ -172,7 +176,31 @@
     background: var(--pink); color: #fff; cursor: pointer;
     box-shadow: 0 1vh 0 var(--pink-dark);
   }
-  #start p { font-size: 2.6vh; margin: 0; opacity: .7; text-align: center; }
+  #start p { font-size: 2.6vh; margin: 0; opacity: .7; text-align: center; max-width: 36em; padding: 0 16px; }
+
+  /* ---------- Phones held upright ----------
+     The keys move under the field, and sizes follow the screen width. */
+  @media (orientation: portrait) {
+    #sky { flex-basis: 17vh; }
+    #sun { width: 14vw; height: 14vw; top: 2vh; box-shadow: 0 0 0 2vw #fff2a8; }
+    #suncloud { left: 7vw; top: calc(2vh + 7vw); width: 19vw; }
+    #music { left: 22vw; top: 3vh; width: 10vw; height: 10vw; font-size: 5vw; }
+    #message { font-size: 6.5vw; margin-top: 5vh; padding: 0 2vw; }
+    #stars { top: 1.5vh; font-size: 6vw; }
+    #main { flex-direction: column; }
+    #field { border-top-right-radius: 0; }
+    #keys { flex: 0 0 auto; padding: 3vh 0 max(4vh, env(safe-area-inset-bottom)); }
+    .pad {
+      gap: 3vw;
+      grid-template-columns: repeat(3, 20vw);
+      grid-template-rows: repeat(2, 20vw);
+    }
+    .key { border-radius: 4vw; font-size: 10vw; box-shadow: 0 1.5vw 0 var(--key-edge); }
+    .key.on { transform: translateY(1.2vw); }
+    #start h1 { font-size: 10vw; }
+    #start button { font-size: 9vw; padding: 2vh 10vw; }
+    #start p { font-size: 4vw; padding: 0 6vw; }
+  }
 
   @keyframes jump {
     0% { transform: translateY(0); }
@@ -211,7 +239,7 @@
 <div id="start">
   <h1>🐷 Muddy Puddles</h1>
   <button id="play">▶ Play</button>
-  <p>Use the arrow keys to take Peppa to the muddy puddle.<br>
+  <p>Use the arrow keys, or swipe on a phone or tablet, to take Peppa to the muddy puddle.
      Press Esc to leave full screen.</p>
 </div>
 
@@ -726,14 +754,36 @@
     if (e.repeat) return; // holding a key down shouldn't zoom Peppa across the field
     const d = DIRS[e.key];
     if (d) {
-      if (d.dy && state.rows === 1) { flash(d.name); nudge(); return; }
-      move(d);
+      go(d);
     } else if (e.key === " ") {
       if (!state.busy) { replay(peppa, "jump"); sfx.oink(); }
     } else {
       nudge();
     }
   });
+  // An arrow key or a swipe. Up/down in level 1 counts as a wrong move.
+  function go(d) {
+    if (d.dy && state.rows === 1) { flash(d.name); nudge(); return; }
+    move(d);
+  }
+
+  // Swipes on phones and tablets: a quick drag anywhere (except on the
+  // on-screen buttons) moves Peppa in the drag's main direction.
+  const SWIPE_MIN = 30; // px
+  let swipeStart = null;
+  document.addEventListener("pointerdown", e => {
+    if (!state.started || e.target.closest(".key, #music")) return;
+    swipeStart = { x: e.clientX, y: e.clientY };
+  });
+  document.addEventListener("pointerup", e => {
+    if (!swipeStart) return;
+    const dx = e.clientX - swipeStart.x, dy = e.clientY - swipeStart.y;
+    swipeStart = null;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < SWIPE_MIN) return; // a tap, not a swipe
+    go(byName[Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : (dy > 0 ? "down" : "up")]);
+  });
+  document.addEventListener("pointercancel", () => { swipeStart = null; });
+
   Object.entries(keyEls).forEach(([name, k]) =>
     k.addEventListener("pointerdown", e => {
       e.preventDefault();
