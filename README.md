@@ -6,7 +6,9 @@ Walk Peppa to the muddy puddle with the arrow keys. Each splash earns a ⭐.
 
 ## Play
 
-Open the root `index.html` in a browser and pick a model with the arrow keys and Enter, or with a click. Then click **Play**.
+**Online:** https://alchemication.github.io/pepa-slop/. It's redeployed automatically on every push to `main` that changes the games.
+
+**Locally:** open the root `index.html` in a browser and pick a model with the arrow keys and Enter, or with a click. Then click **Play**.
 
 The selection page has its own friendly background tune, which starts on the first click or key press. Each game has its own music.
 
