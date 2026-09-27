@@ -10,7 +10,7 @@ music; don't copy the show's artwork or theme tune.
 
 Gameplay
 - The arrow keys walk Peppa one step at a time across a grassy field to a
-  muddy puddle. When she lands in it: a splash, a voice cheers, a star is
+  muddy puddle. When she lands in it: a splash, a happy chime, a star is
   added, and a new puddle appears somewhere else.
 - Level 1 is one row, so only left and right are needed. After 5 puddles the
   field grows to 3 rows and up and down join in.
@@ -20,12 +20,12 @@ Gameplay
 Teaching
 - Big on-screen arrows laid out like a keyboard. They light up when pressed
   and can be clicked or tapped.
-- A friendly voice says each direction as she moves.
+- Each direction has its own soft chime.
 - After a few idle seconds, the needed arrow glows and Peppa turns and waves
   toward the puddle.
 - Wrong keys: the needed arrow glows at once. Only after several misses in a
-  row does the voice nudge ("Try the right arrow!"), at most once every few
-  seconds.
+  row does a soft "over here" chime play and that arrow bounce, at most once
+  every few seconds.
 
 Toddler-proofing
 - A big Play button starts sound and full screen.
@@ -62,14 +62,15 @@ Splash
 
 Sound and music
 - Every sound is soft and gentle, never harsh or buzzy.
+- No speech or computer voices at all: they sound robotic. Use chimes,
+  music and Peppa's own gestures instead.
 - Cheerful background music that reacts to the game: calmer while waiting,
   bouncier while Peppa walks, twinkly when she is one step from the puddle.
   It changes key after each puddle, plays a small fanfare after each round,
   and adds a soft beat in level 2.
 - The music suits the weather: slower and softer when cloudy, dreamy with
   raindrop plinks in the rain, bright with a harp run for the rainbow.
-- Sound effects are in the music's key, and the music gets quieter whenever
-  the voice speaks.
+- Sound effects are in the music's key.
 - A small music on/off button that responds only to the mouse or touch.
 
 Finish with a short explanation of how the game works, for a parent.

@@ -26,9 +26,9 @@ The selection page has its own friendly background tune, which starts on the fir
 
 ### Teaching the keys
 - Big on-screen arrows are laid out like a real keyboard. They light up when pressed, and clicking them moves Peppa too.
-- A voice says each direction ("left", "up") and cheers "Muddy puddle! Hooray!".
+- There's no speech, because computer voices sound robotic. Each direction has its own soft chime instead, and every splash plays a happy chime and an oink.
 - After 4 seconds without a key press, the arrow your child needs glows.
-- **Wrong keys:** the right arrow glows straight away. After 3 wrong keys in a row, the voice gives a gentle nudge like *"Try the right arrow!"*, at most once every 8 seconds. In level 1, ▲ ▼ count as wrong keys.
+- **Wrong keys:** the right arrow glows straight away. After 3 wrong keys in a row, a soft "over here" chime plays (ending on that direction's chime) and the arrow bounces, at most once every 8 seconds. In level 1, ▲ ▼ count as wrong keys.
 
 ### Toddler-proofing
 - The **Play** screen turns on sound and full screen.
@@ -69,7 +69,6 @@ The weather moves one step after each puddle: ☀️ sunny → ⛅ cloudy → �
   - In level 2, a soft beat joins in and the tempo picks up slightly.
 - **The music follows the weather.** Cloudy makes it a little slower and softer, with a held chord. Rain makes it dreamy, with little "raindrop" plinks. The rainbow brings a harp run and extra sparkle.
 - Sound effects play in the music's current key, so everything fits together.
-- The music gets quieter whenever the voice speaks.
 - The 🎵 button turns music on and off. It only responds to the mouse, so key-mashing can't switch it off.
 
 ## Adding a new model

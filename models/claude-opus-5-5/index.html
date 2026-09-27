@@ -205,6 +205,7 @@
   .key.on { background: var(--key-on); transform: translateY(.6vw); box-shadow: 0 .1vw 0 var(--key-edge); }
   .key.off { opacity: .25; }
   .key.hint { animation: hint 1s ease-in-out infinite; }
+  .key.hint.call { animation: call .5s ease-in-out 2, hint 1s ease-in-out 1s infinite; }
 
   /* ---------- Start screen ---------- */
   #start {
@@ -257,6 +258,10 @@
     75% { transform: rotate(8deg); }
   }
   @keyframes pop { 0% { transform: scale(0); } 70% { transform: scale(1.4); } 100% { transform: scale(1); } }
+  @keyframes call {
+    0%, 100% { transform: scale(1); background: var(--key-on); }
+    50% { transform: scale(1.25) translateY(-8%); background: var(--key-on); }
+  }
   @keyframes hint {
     0%, 100% { background: var(--key); }
     50% { background: var(--key-on); transform: scale(1.12); }
@@ -451,7 +456,7 @@
   // ---------- Sound ----------
   // Everything goes through a gentle limiter so nothing gets loud or sharp.
   // Sound effects and music have separate volume knobs.
-  const SFX_VOLUME = 0.5, MUSIC_VOLUME = 0.35, MUSIC_DUCKED = 0.12;
+  const SFX_VOLUME = 0.5, MUSIC_VOLUME = 0.35;
   let ctx = null, sfxBus, musicBus, musicTone;
 
   // The music's mood follows the weather: same song, different feel.
@@ -497,10 +502,16 @@
     o.connect(g).connect(bus);
     o.start(t); o.stop(t + dur + 0.05);
   }
+  const STEP_NOTES = { left: 0, right: 4, up: 7, down: -5 };
   const hz = midi => 440 * 2 ** ((midi - 69) / 12);
   const sfx = {
     // Each direction plays its own soft chime.
-    step: dir => note(hz(72 + musicKey + { left: 0, right: 4, up: 7, down: -5 }[dir]), { dur: 0.35, vol: 0.18 }),
+    step: dir => note(hz(72 + musicKey + STEP_NOTES[dir]), { dur: 0.35, vol: 0.18 }),
+    // "Over here!": a soft call, then the chime of the direction to press.
+    nudge: dir => {
+      note(hz(84 + musicKey), { dur: 0.3, vol: 0.1 });
+      note(hz(72 + musicKey + STEP_NOTES[dir]), { dur: 0.45, vol: 0.16, at: 0.22 });
+    },
     bump: () => note(220, { endFreq: 180, dur: 0.25, vol: 0.12 }),
     oink: () => [0, 0.2].forEach(at =>
       note(330, { endFreq: 240, dur: 0.16, type: "triangle", vol: 0.14, at })),
@@ -627,21 +638,6 @@
   function stopMusic() {
     clearInterval(musicTimer);
   }
-  function setMusicLevel(level) {
-    if (musicBus) musicBus.gain.setTargetAtTime(level, ctx.currentTime, 0.15);
-  }
-
-  // Music gets quieter while the voice is talking.
-  function say(text) {
-    if (!("speechSynthesis" in window)) return;
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = 0.9; u.pitch = 1.3;
-    u.onstart = () => setMusicLevel(MUSIC_DUCKED);
-    u.onend = () => setMusicLevel(MUSIC_VOLUME);
-    speechSynthesis.speak(u);
-  }
-
   // ---------- Layout ----------
   function place(el, x, y, scale) {
     const size = cell * scale;
@@ -713,7 +709,6 @@
     walkTimer = setTimeout(() => peppa.classList.remove("walking"), 400); // back to breathing
     peppa.classList.remove("pointing");
     sfx.step(d.name);
-    say(d.name);
     if (nx === state.px && ny === state.py) setTimeout(splash, 350);
   }
 
@@ -730,7 +725,6 @@
     // Peppa lands back in the puddle about 0.4s into her jump: splash then.
     setTimeout(() => { sfx.splash(); splashEffect(); }, 400);
     setTimeout(sfx.oink, 700);
-    say("Muddy puddle! Hooray!");
     message.textContent = "Splash! Hooray! 🎉";
     state.score++;
     changeKey();
@@ -754,10 +748,8 @@
       beat = 0.38;
       state.y = 1; state.py = 1;
       message.textContent = "Now up ▲ and down ▼ too!";
-      say("Well done! Now you can go up and down too!");
     } else {
       message.textContent = "Well done! 🌈";
-      say("Well done!");
     }
     layout();
     setTimeout(() => { newPuddle(); state.busy = false; }, 2500);
@@ -850,15 +842,11 @@
     hintTimer = setTimeout(showHint, HINT_AFTER_MS);
   }
 
-  // A key that isn't an arrow: glow the right arrow straight away, and only
-  // after a few misses in a row let the voice say something (not too often).
+  // A key that isn't an arrow: glow the right arrow straight away. Only after a
+  // few misses in a row, a soft "over here" chime plays and that arrow gives a
+  // bigger bounce (not too often).
   const NUDGE_AFTER = 3, NUDGE_GAP_MS = 8000;
-  const NUDGES = [
-    d => `Try the ${d} arrow!`,
-    d => `Where's the ${d} arrow?`,
-    d => `Peppa wants to go ${d}!`,
-  ];
-  let wrongPresses = 0, lastNudge = 0, nudgeIndex = 0;
+  let wrongPresses = 0, lastNudge = 0;
   function nudge() {
     if (state.busy) return;
     showHint();
@@ -866,7 +854,9 @@
     if (wrongPresses < NUDGE_AFTER || Date.now() - lastNudge < NUDGE_GAP_MS) return;
     wrongPresses = 0;
     lastNudge = Date.now();
-    say(NUDGES[nudgeIndex++ % NUDGES.length](hintDir()));
+    const dir = hintDir();
+    sfx.nudge(dir);
+    replay(keyEls[dir], "call");
   }
 
   // ---------- Input ----------
@@ -947,7 +937,6 @@
     document.documentElement.requestFullscreen?.().catch(() => {});
     layout();
     startMusic();
-    say("Help Peppa find the muddy puddle!");
     resetHint();
   }
   $("#play").addEventListener("click", start);
