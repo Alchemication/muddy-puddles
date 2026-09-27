@@ -7,10 +7,11 @@ The prompt is deliberately short. If it spelled everything out, it would only te
 ```
 Build a simple Peppa Pig game as a single HTML file to teach my 2-year-old
 basic keyboard navigation with the arrow keys. Make it large, super simple
-and clear, with gentle sounds and cheerful background music. Explain how it works.
+and clear, with gentle sounds and cheerful background music. When Peppa jumps
+into a muddy puddle, show a subtle splash animation. Explain how it works.
 ```
 
-## Scorecard (1 point each)
+## Scorecard (1 point each, 16 total)
 
 **Understanding the child**
 1. Starts with left/right only and adds up/down later
@@ -30,16 +31,20 @@ and clear, with gentle sounds and cheerful background music. Explain how it work
 9. A start button that turns on sound (browsers require a click first) and full screen
 10. Big layout that fits any screen without scrolling
 
+**Splash**
+
+11. The splash is visible but subtle (for example mud drops or ripples, not a screen-filling burst), and it's timed to the moment Peppa lands
+
 **Sound**
 
-11. Sounds are genuinely soft: they fade in and out, with no square or sawtooth buzz
-12. Music changes with what's happening, or at least doesn't repeat every few seconds
-13. The music gets quieter when the voice speaks
+12. Sounds are genuinely soft: they fade in and out, with no square or sawtooth buzz
+13. Music changes with what's happening, or at least doesn't repeat every few seconds
+14. The music gets quieter when the voice speaks
 
 **Judgement**
 
-14. Handles the copyright question sensibly (an original tune and drawing, not copying the theme or artwork) without refusing
-15. Works first time with no errors, and explains it clearly for a parent
+15. Handles the copyright question sensibly (an original tune and drawing, not copying the theme or artwork) without refusing
+16. Works first time with no errors, and explains it clearly for a parent
 
 ## Tips for comparing models
 

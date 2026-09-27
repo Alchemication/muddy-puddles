@@ -3,623 +3,171 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Peppa's Muddy Puddles</title>
+<title>Muddy Puddles Models</title>
 <style>
   :root {
     --sky: #8fd3ff;
     --grass: #6cc24a;
-    --grass-dot: #7fd35c;
-    --mud: #7a4a1e;
-    --mud-light: #a0662f;
-    --key: #ffffff;
-    --key-on: #ffd23f;
-    --key-edge: #c9c9c9;
+    --card: #ffffff;
+    --card-edge: #c9c9c9;
+    --focus: #ffd23f;
     --text: #2b2b2b;
+    --muted: #5b6770;
     --pink: #f7a1c4;
-    --pink-dark: #ef6f9f;
-    --dress: #e0282f;
   }
-  html, body {
-    margin: 0; height: 100%; overflow: hidden;
-    background: var(--sky); color: var(--text);
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    background: linear-gradient(var(--sky) 60%, var(--grass) 60%) fixed;
+    color: var(--text);
     font-family: "Chalkboard SE", "Comic Sans MS", "Marker Felt", system-ui, sans-serif;
-    user-select: none; -webkit-user-select: none;
+    padding: 5vh 16px;
   }
-  #game { position: fixed; inset: 0; display: flex; flex-direction: column; }
-
-  /* ---------- Sky ---------- */
-  #sky {
-    flex: 0 0 16vh; position: relative;
-    display: flex; align-items: center; justify-content: center; gap: 3vw;
+  h1 { font-size: clamp(32px, 7vw, 64px); text-align: center; margin: 0 0 1vh; }
+  .sub { text-align: center; font-size: clamp(16px, 2.4vw, 22px); margin: 0 0 5vh; color: var(--muted); }
+  #models {
+    list-style: none; margin: 0 auto; padding: 0; max-width: 960px;
+    display: grid; gap: 24px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   }
-  #sun {
-    position: absolute; left: 3vw; top: 2vh;
-    width: 11vh; height: 11vh; border-radius: 50%;
-    background: #ffe04a; box-shadow: 0 0 0 1.5vh #fff2a8;
+  #models a {
+    display: block; height: 100%; padding: 28px 24px;
+    background: var(--card); color: inherit; text-decoration: none;
+    border-radius: 24px; box-shadow: 0 8px 0 var(--card-edge);
+    transition: transform .1s, background .1s;
+    outline: none;
   }
+  #models a:hover, #models a:focus-visible { background: var(--focus); transform: translateY(-4px); }
+  .pig { font-size: 56px; line-height: 1; }
+  .name { font-size: 28px; font-weight: bold; margin: 12px 0 4px; }
+  .meta { font-size: 16px; color: var(--muted); }
+  .note { font-size: 16px; margin-top: 12px; }
   #music {
-    position: absolute; left: 17vh; top: 4vh;
-    width: 7vh; height: 7vh; border: none; border-radius: 50%;
-    background: rgba(255,255,255,.6); font-size: 3.5vh; cursor: pointer;
+    position: fixed; top: 16px; right: 16px;
+    font: inherit; font-size: 18px; padding: 10px 18px;
+    border: none; border-radius: 999px; cursor: pointer;
+    background: var(--card); color: var(--text); box-shadow: 0 4px 0 var(--card-edge);
   }
-  #music.muted { opacity: .35; }
-  #message { font-size: 6vh; font-weight: bold; text-align: center; }
-  #stars { position: absolute; right: 3vw; top: 3vh; font-size: 7vh; letter-spacing: .5vw; }
-  .star { display: inline-block; animation: pop .5s ease-out; }
-
-  /* ---------- Main area ---------- */
-  #main { flex: 1; display: flex; min-height: 0; }
-  #field {
-    flex: 1; position: relative; overflow: hidden;
-    background: var(--grass);
-    border-top-right-radius: 4vh;
-  }
-  .tile {
-    position: absolute; border-radius: 50%;
-    background: var(--grass-dot);
-  }
-  #puddle {
-    position: absolute; transition: opacity .3s;
-  }
-  #puddle svg, #peppa svg { width: 100%; height: 100%; display: block; overflow: visible; }
-  #peppa {
-    position: absolute; z-index: 2;
-    transition: left .35s ease-in-out, top .35s ease-in-out;
-  }
-  #peppa .flip { width: 100%; height: 100%; transition: transform .2s; }
-  #peppa.left .flip { transform: scaleX(-1); }
-  #peppa .bounce { width: 100%; height: 100%; }
-  #peppa.jump .bounce { animation: jump .6s ease-out; }
-  #peppa.bump .bounce { animation: wiggle .35s ease-in-out; }
-
-  .drop {
-    position: absolute; z-index: 3; border-radius: 50%;
-    background: var(--mud-light);
-    animation: fly .8s ease-out forwards;
-  }
-
-  /* ---------- Keys panel ---------- */
-  #keys {
-    flex: 0 0 30vw; display: flex; align-items: center; justify-content: center;
-  }
-  .pad {
-    display: grid; gap: 1.2vw;
-    grid-template-columns: repeat(3, 8.5vw);
-    grid-template-rows: repeat(2, 8.5vw);
-    grid-template-areas: ". up ." "left down right";
-  }
-  .key {
-    border: none; border-radius: 1.6vw;
-    background: var(--key); color: var(--text);
-    box-shadow: 0 .7vw 0 var(--key-edge);
-    font-size: 4.5vw; line-height: 1; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: transform .08s, background .08s, box-shadow .08s, opacity .3s;
-  }
-  .key[data-dir="up"] { grid-area: up; }
-  .key[data-dir="left"] { grid-area: left; }
-  .key[data-dir="down"] { grid-area: down; }
-  .key[data-dir="right"] { grid-area: right; }
-  .key.on { background: var(--key-on); transform: translateY(.6vw); box-shadow: 0 .1vw 0 var(--key-edge); }
-  .key.off { opacity: .25; }
-  .key.hint { animation: hint 1s ease-in-out infinite; }
-
-  /* ---------- Start screen ---------- */
-  #start {
-    position: fixed; inset: 0; z-index: 10;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4vh;
-    background: var(--sky);
-  }
-  #start h1 { font-size: 9vh; margin: 0; }
-  #start button {
-    font: inherit; font-size: 7vh; font-weight: bold;
-    padding: 2vh 7vh; border: none; border-radius: 5vh;
-    background: var(--pink); color: #fff; cursor: pointer;
-    box-shadow: 0 1vh 0 var(--pink-dark);
-  }
-  #start p { font-size: 2.6vh; margin: 0; opacity: .7; text-align: center; }
-
-  @keyframes jump {
-    0% { transform: translateY(0); }
-    40% { transform: translateY(-45%) scale(1.05); }
-    70% { transform: translateY(0) scale(1.1, .9); }
-    100% { transform: translateY(0); }
-  }
-  @keyframes wiggle {
-    0%, 100% { transform: rotate(0); }
-    25% { transform: rotate(-8deg); }
-    75% { transform: rotate(8deg); }
-  }
-  @keyframes pop { 0% { transform: scale(0); } 70% { transform: scale(1.4); } 100% { transform: scale(1); } }
-  @keyframes hint {
-    0%, 100% { background: var(--key); }
-    50% { background: var(--key-on); transform: scale(1.12); }
-  }
-  @keyframes fly {
-    to { transform: translate(var(--dx), var(--dy)) scale(.3); opacity: 0; }
-  }
+  #music.on { background: var(--pink); }
+  footer { text-align: center; margin-top: 6vh; font-size: 16px; }
+  footer a { color: var(--text); }
 </style>
 </head>
 <body>
-
-<div id="start">
+  <button id="music" tabindex="-1">🎵 Music</button>
   <h1>🐷 Muddy Puddles</h1>
-  <button id="play">▶ Play</button>
-  <p>Use the arrow keys to take Peppa to the muddy puddle.<br>
-     Press Esc to leave full screen.</p>
-</div>
-
-<div id="game">
-  <div id="sky">
-    <div id="sun"></div>
-    <button id="music" aria-label="Music on/off" tabindex="-1">🎵</button>
-    <div id="message">Find the muddy puddle!</div>
-    <div id="stars"></div>
-  </div>
-  <div id="main">
-    <div id="field">
-      <div id="puddle">
-        <svg viewBox="0 0 200 100">
-          <ellipse cx="100" cy="55" rx="95" ry="40" fill="var(--mud)"/>
-          <ellipse cx="80" cy="45" rx="40" ry="10" fill="var(--mud-light)" opacity=".7"/>
-        </svg>
-      </div>
-      <div id="peppa">
-        <div class="bounce"><div class="flip">
-          <svg viewBox="0 0 200 230">
-            <!-- tail -->
-            <path d="M52 160 q-18 -4 -14 -16 q4 -10 12 -2 q6 8 -8 10" fill="none" stroke="var(--pink-dark)" stroke-width="5" stroke-linecap="round"/>
-            <!-- legs + shoes -->
-            <line x1="82" y1="180" x2="82" y2="212" stroke="var(--pink-dark)" stroke-width="7" stroke-linecap="round"/>
-            <line x1="118" y1="180" x2="118" y2="212" stroke="var(--pink-dark)" stroke-width="7" stroke-linecap="round"/>
-            <ellipse cx="86" cy="216" rx="13" ry="7" fill="#222"/>
-            <ellipse cx="122" cy="216" rx="13" ry="7" fill="#222"/>
-            <!-- arms -->
-            <line x1="68" y1="130" x2="40" y2="112" stroke="var(--pink-dark)" stroke-width="7" stroke-linecap="round"/>
-            <line x1="132" y1="130" x2="162" y2="112" stroke="var(--pink-dark)" stroke-width="7" stroke-linecap="round"/>
-            <!-- dress -->
-            <path d="M72 108 L128 108 L156 184 Q100 196 44 184 Z" fill="var(--dress)" stroke="#b81d23" stroke-width="3" stroke-linejoin="round"/>
-            <!-- ears -->
-            <ellipse cx="66" cy="28" rx="10" ry="18" fill="var(--pink)" stroke="var(--pink-dark)" stroke-width="3" transform="rotate(-20 66 28)"/>
-            <ellipse cx="90" cy="20" rx="10" ry="18" fill="var(--pink)" stroke="var(--pink-dark)" stroke-width="3" transform="rotate(5 90 20)"/>
-            <!-- head -->
-            <ellipse cx="96" cy="72" rx="56" ry="42" fill="var(--pink)" stroke="var(--pink-dark)" stroke-width="3" transform="rotate(-18 96 72)"/>
-            <!-- snout -->
-            <ellipse cx="152" cy="42" rx="15" ry="21" fill="var(--pink)" stroke="var(--pink-dark)" stroke-width="3" transform="rotate(-18 152 42)"/>
-            <circle cx="148" cy="38" r="3.5" fill="var(--pink-dark)"/>
-            <circle cx="157" cy="46" r="3.5" fill="var(--pink-dark)"/>
-            <!-- eyes -->
-            <circle cx="112" cy="48" r="9" fill="#fff" stroke="#222" stroke-width="2"/>
-            <circle cx="132" cy="40" r="9" fill="#fff" stroke="#222" stroke-width="2"/>
-            <circle cx="114" cy="48" r="4.5" fill="#222"/>
-            <circle cx="134" cy="40" r="4.5" fill="#222"/>
-            <!-- cheek + smile -->
-            <circle cx="74" cy="84" r="11" fill="var(--pink-dark)" opacity=".8"/>
-            <path d="M104 88 Q122 100 140 80" fill="none" stroke="#b81d23" stroke-width="4" stroke-linecap="round"/>
-          </svg>
-        </div></div>
-      </div>
-    </div>
-    <div id="keys">
-      <div class="pad">
-        <button class="key" data-dir="up" aria-label="Up">▲</button>
-        <button class="key" data-dir="left" aria-label="Left">◀</button>
-        <button class="key" data-dir="down" aria-label="Down">▼</button>
-        <button class="key" data-dir="right" aria-label="Right">▶</button>
-      </div>
-    </div>
-  </div>
-</div>
+  <p class="sub">The same toddler arrow-key game, built by different AI models. Pick one to play.</p>
+  <ul id="models"></ul>
+  <footer><a href="PROMPT.md">The prompt and scorecard used to compare them</a></footer>
 
 <script>
-(() => {
-  const PUDDLES_PER_ROUND = 5;
-  const HINT_AFTER_MS = 4000;
-  const DIRS = {
-    ArrowLeft:  { name: "left",  dx: -1, dy: 0 },
-    ArrowRight: { name: "right", dx: 1,  dy: 0 },
-    ArrowUp:    { name: "up",    dx: 0,  dy: -1 },
-    ArrowDown:  { name: "down",  dx: 0,  dy: 1 },
-  };
-  const byName = Object.fromEntries(Object.values(DIRS).map(d => [d.name, d]));
+  // To add a model: put its game in models/<folder>/index.html and add one line here.
+  const MODELS = [
+    { folder: "claude-opus-5-5", name: "Claude Opus 5.5", maker: "Anthropic", date: "2026-09-27",
+      note: "Built from a short prompt plus follow-ups (softer sounds, music, wrong-key hints)." },
+  ];
 
-  const $ = s => document.querySelector(s);
-  const field = $("#field"), peppa = $("#peppa"), puddle = $("#puddle");
-  const message = $("#message"), stars = $("#stars");
-  const keyEls = Object.fromEntries([...document.querySelectorAll(".key")].map(k => [k.dataset.dir, k]));
+  const list = document.getElementById("models");
+  for (const m of MODELS) {
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.href = `models/${m.folder}/index.html`;
+    const parts = [["pig", "🐷"], ["name", m.name], ["meta", `${m.maker} · ${m.date}`], ["note", m.note]];
+    for (const [cls, text] of parts) {
+      if (!text) continue;
+      const div = document.createElement("div");
+      div.className = cls; div.textContent = text;
+      a.append(div);
+    }
+    li.append(a);
+    list.append(li);
+  }
 
-  // Level 1: one row, only left/right. Level 2: three rows, all four arrows.
-  const state = { level: 1, cols: 5, rows: 1, x: 0, y: 0, px: 4, py: 0, score: 0, busy: false, started: false };
-  let cell = 0, offX = 0, offY = 0, hintTimer = null;
+  // Arrow keys move between models, Enter opens one (fitting, for an arrow-key game).
+  const links = [...list.querySelectorAll("a")];
+  links[0]?.focus();
+  document.addEventListener("keydown", e => {
+    const i = links.indexOf(document.activeElement);
+    const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+    if (!step) return;
+    e.preventDefault();
+    links[(Math.max(i, 0) + step + links.length) % links.length].focus();
+    chime();
+  });
 
-  // ---------- Sound ----------
-  // Everything goes through a gentle limiter so nothing gets loud or sharp.
-  // Sound effects and music have separate volume knobs.
-  const SFX_VOLUME = 0.5, MUSIC_VOLUME = 0.35, MUSIC_DUCKED = 0.12;
-  let ctx = null, sfxBus, musicBus;
+  // ---------- Music ----------
+  // A friendly original tune, different from any game's own music.
+  // Browsers only allow sound after a click or key press, so it starts on the first one.
+  let ctx = null, bus = null, timer = null, playing = false, userStopped = false;
+  const hz = m => 440 * 2 ** ((m - 69) / 12);
   function audio() {
     if (!ctx) {
       ctx = new (window.AudioContext || window.webkitAudioContext)();
       const limiter = ctx.createDynamicsCompressor();
-      limiter.threshold.value = -18; limiter.ratio.value = 8;
-      const soften = ctx.createBiquadFilter(); // take the edge off high frequencies
+      const soften = ctx.createBiquadFilter();
       soften.type = "lowpass"; soften.frequency.value = 3500;
-      soften.connect(limiter).connect(ctx.destination);
-      sfxBus = ctx.createGain(); sfxBus.gain.value = SFX_VOLUME; sfxBus.connect(soften);
-      musicBus = ctx.createGain(); musicBus.gain.value = MUSIC_VOLUME; musicBus.connect(soften);
+      bus = ctx.createGain(); bus.gain.value = 0.35;
+      bus.connect(soften).connect(limiter).connect(ctx.destination);
     }
     if (ctx.state === "suspended") ctx.resume();
     return ctx;
   }
-  // A soft note: fades in quickly (no click) and fades out smoothly.
-  function note(freq, { endFreq = freq, dur = 0.3, type = "sine", vol = 0.2, at = 0, bus = sfxBus } = {}) {
+  function note(m, { dur = 0.5, vol = 0.1, type = "sine", at = 0 } = {}) {
     const a = audio(), o = a.createOscillator(), g = a.createGain(), t = a.currentTime + at;
-    o.type = type;
-    o.frequency.setValueAtTime(freq, t);
-    if (endFreq !== freq) o.frequency.exponentialRampToValueAtTime(endFreq, t + dur);
+    o.type = type; o.frequency.value = hz(m);
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(vol, t + 0.02);
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     o.connect(g).connect(bus);
     o.start(t); o.stop(t + dur + 0.05);
   }
-  const hz = midi => 440 * 2 ** ((midi - 69) / 12);
-  const sfx = {
-    // Each direction plays its own soft chime.
-    step: dir => note(hz(72 + musicKey + { left: 0, right: 4, up: 7, down: -5 }[dir]), { dur: 0.35, vol: 0.18 }),
-    bump: () => note(220, { endFreq: 180, dur: 0.25, vol: 0.12 }),
-    oink: () => [0, 0.2].forEach(at =>
-      note(330, { endFreq: 240, dur: 0.16, type: "triangle", vol: 0.14, at })),
-    // Splash = a soft "bloop" followed by a happy rising chime.
-    splash: () => {
-      note(400, { endFreq: 150, dur: 0.3, vol: 0.2 });
-      [72, 76, 79, 84].forEach((m, i) => note(hz(m + musicKey), { dur: 0.5, vol: 0.13, at: 0.25 + i * 0.1 }));
-    },
-    // End of a round: a longer run up two octaves.
-    fanfare: () => [60, 64, 67, 72, 76, 79, 84].forEach((m, i) =>
-      note(hz(m + musicKey), { dur: i === 6 ? 1.2 : 0.4, vol: 0.12, at: i * 0.09 })),
-  };
+  function chime() { if (playing) note(79, { dur: 0.3, vol: 0.06 }); }
 
-  // ---------- Background music ----------
-  // If a music.mp3 file sits next to this page, it plays that on a loop.
-  // Otherwise it plays a short original tune built into the page.
-  const musicFile = new Audio("music.mp3");
-  musicFile.loop = true;
-  let useFile = false, musicOn = true, musicTimer = null;
+  // G major, 8 bars. Melody: [midi note, beats], 0 = rest. One chord per bar.
+  const TUNE = [
+    [[67,1],[71,1],[74,1.5],[71,.5]], [[72,1],[76,1],[74,2]],
+    [[74,1],[72,.5],[71,.5],[69,1],[66,1]], [[67,2],[0,2]],
+    [[71,1],[71,.5],[72,.5],[74,1],[79,1]], [[76,1],[74,1],[72,2]],
+    [[69,1],[71,.5],[72,.5],[74,1],[66,1]], [[67,3],[0,1]],
+  ];
+  const CHORDS = [[43,47,50], [48,52,55], [50,54,57], [43,47,50], [40,43,47], [48,52,55], [50,54,57], [43,47,50]];
+  const BEAT = 0.45;
+  let nextTime = 0, bar = 0, tick = 0; // tick = eighth note in the bar (0-7)
 
-  // Original song in four 4-bar sections, played in a varied order.
-  // Melody notes are semitones above the key's root (12 = middle of the tune), 0 = rest.
-  // Each bar is a list of [note, beats] adding up to 4 beats.
-  const SONG = {
-    A: { chords: ["I", "IV", "I", "V"], bars: [
-      [[12,1],[16,1],[19,1],[16,1]], [[17,1],[21,1],[19,2]],
-      [[16,1],[19,1],[24,1],[19,1]], [[17,1],[14,1],[12,2]] ] },
-    B: { chords: ["IV", "I", "V", "I"], bars: [
-      [[21,1],[21,1],[19,1],[19,1]], [[17,1],[17,1],[16,2]],
-      [[14,1],[16,1],[17,1],[14,1]], [[12,3],[0,1]] ] },
-    C: { chords: ["vi", "IV", "I", "V"], bars: [
-      [[16,.5],[16,.5],[19,1],[21,1],[19,1]], [[17,1],[16,.5],[14,.5],[12,2]],
-      [[16,1],[19,1],[16,1],[12,1]], [[14,2],[19,2]] ] },
-    D: { chords: ["I", "vi", "IV", "V"], bars: [
-      [[24,2],[23,1],[21,1]], [[19,2],[16,2]],
-      [[17,1],[19,1],[21,1],[17,1]], [[19,4]] ] },
-  };
-  const ORDER = ["A", "B", "A", "C", "D", "B"];
-  const CHORDS = { I: [0, 4, 7], IV: [5, 9, 12], V: [7, 11, 14], vi: [9, 12, 16] };
-  // Every muddy puddle moves the song (and the sound effects) to a new key.
-  const KEYS = [0, 5, 2, -2];
-  let musicKey = 0, keyIndex = 0, pendingKey = null;
-  let beat = 0.42;                 // seconds per beat; a little quicker in level 2
-  let lastMove = 0;                // when Peppa last moved, to tell "playing" from "waiting"
-  let nextTime = 0, secIdx = 0, bar = 0, tick = 0; // tick = eighth note in the bar (0-7)
-  let noiseBuf = null;
-
-  function changeKey() { pendingKey = KEYS[++keyIndex % KEYS.length]; }
-
-  function shaker(at) {
-    const a = audio();
-    if (!noiseBuf) {
-      noiseBuf = a.createBuffer(1, a.sampleRate * 0.06, a.sampleRate);
-      const d = noiseBuf.getChannelData(0);
-      for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length) ** 3;
-    }
-    const src = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain();
-    src.buffer = noiseBuf; f.type = "bandpass"; f.frequency.value = 3000; g.gain.value = 0.08;
-    src.connect(f).connect(g).connect(musicBus);
-    src.start(a.currentTime + at);
-  }
-
-  function playTick(at) {
-    if (tick === 0 && pendingKey !== null) { musicKey = pendingKey; pendingKey = null; }
-    const sec = SONG[ORDER[secIdx]], chord = CHORDS[sec.chords[bar]];
-    const root = 48 + musicKey, now = Date.now();
-    const playing = now - lastMove < 3000, waiting = now - lastMove > 8000;
-    const nearPuddle = !state.busy && Math.abs(state.px - state.x) + Math.abs(state.py - state.y) === 1;
-    const m = { bus: musicBus, at };
-
-    // Bass: root on beat 1, fifth on beat 3.
-    if (tick === 0) note(hz(root - 12 + chord[0]), { ...m, dur: beat * 1.8, type: "triangle", vol: 0.13 });
-    if (tick === 4) note(hz(root - 12 + chord[0] + 7), { ...m, dur: beat * 1.8, type: "triangle", vol: 0.11 });
-
-    // Melody (glockenspiel-ish). Softer while Eliot is thinking.
-    let pos = 0;
-    for (const [n, beats] of sec.bars[bar]) {
-      if (pos * 2 === tick && n) {
-        note(hz(root + n), { ...m, dur: 0.6, vol: waiting ? 0.07 : 0.12 });
-        note(hz(root + n) * 2, { ...m, dur: 0.25, vol: 0.02 });
-      }
-      pos += beats;
-    }
-
-    // While Peppa is on the move: bouncy off-beat chords.
-    if (playing && (tick === 2 || tick === 6))
-      chord.forEach(c => note(hz(root + 12 + c), { ...m, dur: 0.18, type: "triangle", vol: 0.035 }));
-
-    // One step from the puddle: a twinkly rising arpeggio to build excitement.
-    if (nearPuddle)
-      note(hz(root + 24 + chord[tick % 3] + (tick >= 3 ? 12 : 0)), { ...m, dur: 0.2, vol: 0.035 });
-
-    // Level 2: a soft beat joins in.
-    if (state.level >= 2) {
-      if (tick % 2 === 1) shaker(at);
-      if (tick === 0 || tick === 4) note(110, { ...m, endFreq: 45, dur: 0.2, vol: 0.18 });
-    }
-  }
-
-  function scheduleMusic() {
+  function schedule() {
     const a = audio();
     while (nextTime < a.currentTime + 0.4) {
-      playTick(Math.max(0, nextTime - a.currentTime));
-      nextTime += beat / 2;
-      if (++tick === 8) {
-        tick = 0;
-        if (++bar === 4) { bar = 0; secIdx = (secIdx + 1) % ORDER.length; }
+      const at = Math.max(0, nextTime - a.currentTime), chord = CHORDS[bar];
+      if (tick === 0) note(chord[0] - 12, { dur: BEAT * 1.8, type: "triangle", vol: 0.13, at });
+      if (tick === 4) note(chord[2] - 12, { dur: BEAT * 1.8, type: "triangle", vol: 0.11, at });
+      if (tick === 2 || tick === 6)
+        chord.forEach(c => note(c + 12, { dur: 0.2, type: "triangle", vol: 0.03, at }));
+      let pos = 0;
+      for (const [m, beats] of TUNE[bar]) {
+        if (pos * 2 === tick && m) {
+          note(m, { dur: 0.6, vol: 0.11, at });
+          note(m + 12, { dur: 0.25, vol: 0.015, at });
+        }
+        pos += beats;
       }
+      nextTime += BEAT / 2;
+      if (++tick === 8) { tick = 0; bar = (bar + 1) % TUNE.length; }
     }
   }
-  function startMusic() {
-    if (!musicOn) return;
-    if (useFile) { musicFile.play().catch(() => {}); return; }
-    audio();
-    nextTime = ctx.currentTime + 0.1;
-    clearInterval(musicTimer);
-    musicTimer = setInterval(scheduleMusic, 100);
+  const btn = document.getElementById("music");
+  function setMusic(on) {
+    playing = on;
+    btn.classList.toggle("on", on);
+    btn.textContent = on ? "🎵 Music on" : "🎵 Music";
+    clearInterval(timer);
+    if (on) { nextTime = audio().currentTime + 0.1; timer = setInterval(schedule, 100); }
   }
-  function stopMusic() {
-    musicFile.pause();
-    clearInterval(musicTimer);
-  }
-  function setMusicLevel(level) {
-    musicFile.volume = level;
-    if (musicBus) musicBus.gain.setTargetAtTime(level, ctx.currentTime, 0.15);
-  }
-  musicFile.volume = MUSIC_VOLUME;
-  musicFile.addEventListener("canplay", () => { useFile = true; }, { once: true });
-  musicFile.load();
-
-  // Music gets quieter while the voice is talking.
-  function say(text) {
-    if (!("speechSynthesis" in window)) return;
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = 0.9; u.pitch = 1.3;
-    u.onstart = () => setMusicLevel(MUSIC_DUCKED);
-    u.onend = () => setMusicLevel(MUSIC_VOLUME);
-    speechSynthesis.speak(u);
-  }
-
-  // ---------- Layout ----------
-  function place(el, x, y, scale) {
-    const size = cell * scale;
-    el.style.width = size + "px";
-    el.style.height = size + "px";
-    el.style.left = offX + x * cell + (cell - size) / 2 + "px";
-    el.style.top = offY + y * cell + (cell - size) / 2 + "px";
-  }
-  function layout() {
-    const w = field.clientWidth, h = field.clientHeight;
-    cell = Math.min(w / state.cols, h / state.rows);
-    offX = (w - cell * state.cols) / 2;
-    offY = (h - cell * state.rows) / 2;
-    field.querySelectorAll(".tile").forEach(t => t.remove());
-    for (let y = 0; y < state.rows; y++)
-      for (let x = 0; x < state.cols; x++) {
-        const t = document.createElement("div");
-        t.className = "tile";
-        field.prepend(t);
-        place(t, x, y, 0.8);
-      }
-    peppa.style.transition = "none";
-    place(peppa, state.x, state.y, 0.85);
-    place(puddle, state.px, state.py, 0.9);
-    peppa.offsetWidth; // flush so the next move animates
-    peppa.style.transition = "";
-    keyEls.up.classList.toggle("off", state.rows === 1);
-    keyEls.down.classList.toggle("off", state.rows === 1);
-  }
-
-  // ---------- Game ----------
-  function newPuddle() {
-    let px, py;
-    do {
-      px = Math.floor(Math.random() * state.cols);
-      py = Math.floor(Math.random() * state.rows);
-    } while (Math.abs(px - state.x) + Math.abs(py - state.y) < 2);
-    state.px = px; state.py = py;
-    place(puddle, px, py, 0.9);
-    puddle.style.opacity = 1;
-    message.textContent = "Find the muddy puddle!";
-    resetHint();
-  }
-
-  function flash(dir) {
-    const k = keyEls[dir];
-    k.classList.add("on");
-    setTimeout(() => k.classList.remove("on"), 150);
-  }
-
-  function move(d) {
-    if (state.busy) return;
-    flash(d.name);
-    resetHint();
-    wrongPresses = 0;
-    lastMove = Date.now();
-    if (d.dx) peppa.classList.toggle("left", d.dx < 0);
-    const nx = state.x + d.dx, ny = state.y + d.dy;
-    if (nx < 0 || ny < 0 || nx >= state.cols || ny >= state.rows) {
-      sfx.bump();
-      replay(peppa, "bump");
-      return;
-    }
-    state.x = nx; state.y = ny;
-    place(peppa, nx, ny, 0.85);
-    sfx.step(d.name);
-    say(d.name);
-    if (nx === state.px && ny === state.py) setTimeout(splash, 350);
-  }
-
-  function replay(el, cls) {
-    el.classList.remove(cls);
-    el.offsetWidth;
-    el.classList.add(cls);
-  }
-
-  function splash() {
-    state.busy = true;
-    clearHint();
-    replay(peppa, "jump");
-    sfx.splash();
-    setTimeout(sfx.oink, 300);
-    say("Muddy puddle! Hooray!");
-    message.textContent = "Splash! Hooray! 🎉";
-    throwDrops();
-    state.score++;
-    changeKey();
-    const s = document.createElement("span");
-    s.className = "star"; s.textContent = "⭐";
-    stars.append(s);
-
-    setTimeout(() => {
-      puddle.style.opacity = 0;
-      if (state.score % PUDDLES_PER_ROUND === 0) roundDone();
-      else { newPuddle(); state.busy = false; }
-    }, 1800);
-  }
-
-  function roundDone() {
-    sfx.fanfare();
-    stars.textContent = "";
-    if (state.level === 1) {
-      state.level = 2; state.rows = 3;
-      beat = 0.38;
-      state.y = 1; state.py = 1;
-      message.textContent = "Now up ▲ and down ▼ too!";
-      say("Well done! Now you can go up and down too!");
-    } else {
-      message.textContent = "Well done! 🌈";
-      say("Well done!");
-    }
-    layout();
-    setTimeout(() => { newPuddle(); state.busy = false; }, 2500);
-  }
-
-  function throwDrops() {
-    const r = puddle.getBoundingClientRect(), f = field.getBoundingClientRect();
-    const cx = r.left - f.left + r.width / 2, cy = r.top - f.top + r.height / 2;
-    for (let i = 0; i < 14; i++) {
-      const d = document.createElement("div"), size = cell * (0.06 + Math.random() * 0.08);
-      const angle = Math.PI + Math.random() * Math.PI, dist = cell * (0.5 + Math.random() * 0.6);
-      d.className = "drop";
-      Object.assign(d.style, { width: size + "px", height: size + "px", left: cx + "px", top: cy + "px" });
-      d.style.setProperty("--dx", Math.cos(angle) * dist + "px");
-      d.style.setProperty("--dy", Math.sin(angle) * dist + "px");
-      field.append(d);
-      setTimeout(() => d.remove(), 900);
-    }
-  }
-
-  // ---------- Hints: glow the arrow that points toward the puddle ----------
-  function hintDir() {
-    return state.px !== state.x
-      ? (state.px < state.x ? "left" : "right")
-      : (state.py < state.y ? "up" : "down");
-  }
-  function showHint() {
-    if (!state.busy) keyEls[hintDir()].classList.add("hint");
-  }
-  function clearHint() {
-    clearTimeout(hintTimer);
-    Object.values(keyEls).forEach(k => k.classList.remove("hint"));
-  }
-  function resetHint() {
-    clearHint();
-    hintTimer = setTimeout(showHint, HINT_AFTER_MS);
-  }
-
-  // A key that isn't an arrow: glow the right arrow straight away, and only
-  // after a few misses in a row let the voice say something (not too often).
-  const NUDGE_AFTER = 3, NUDGE_GAP_MS = 8000;
-  const NUDGES = [
-    d => `Try the ${d} arrow!`,
-    d => `Where's the ${d} arrow?`,
-    d => `Peppa wants to go ${d}!`,
-  ];
-  let wrongPresses = 0, lastNudge = 0, nudgeIndex = 0;
-  function nudge() {
-    if (state.busy) return;
-    showHint();
-    wrongPresses++;
-    if (wrongPresses < NUDGE_AFTER || Date.now() - lastNudge < NUDGE_GAP_MS) return;
-    wrongPresses = 0;
-    lastNudge = Date.now();
-    say(NUDGES[nudgeIndex++ % NUDGES.length](hintDir()));
-  }
-
-  // ---------- Input ----------
-  document.addEventListener("keydown", e => {
-    if (!state.started) {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); start(); }
-      return;
-    }
-    if (e.metaKey || e.ctrlKey || e.altKey || e.key === "Escape") return;
-    e.preventDefault();
-    if (e.repeat) return; // holding a key down shouldn't zoom Peppa across the field
-    const d = DIRS[e.key];
-    if (d) {
-      if (d.dy && state.rows === 1) { flash(d.name); nudge(); return; }
-      move(d);
-    } else if (e.key === " ") {
-      if (!state.busy) { replay(peppa, "jump"); sfx.oink(); }
-    } else {
-      nudge();
-    }
-  });
-  Object.entries(keyEls).forEach(([name, k]) =>
-    k.addEventListener("pointerdown", e => {
-      e.preventDefault();
-      if (state.started && !(byName[name].dy && state.rows === 1)) move(byName[name]);
-    }));
-
-  function start() {
-    if (state.started) return;
-    state.started = true;
-    audio();
-    $("#start").remove();
-    document.documentElement.requestFullscreen?.().catch(() => {});
-    layout();
-    startMusic();
-    say("Help Peppa find the muddy puddle!");
-    resetHint();
-  }
-  $("#play").addEventListener("click", start);
-  $("#music").addEventListener("click", e => {
-    musicOn = !musicOn;
-    e.currentTarget.classList.toggle("muted", !musicOn);
-    musicOn ? startMusic() : stopMusic();
-  });
-  window.addEventListener("resize", layout);
-  layout();
-})();
+  btn.addEventListener("click", () => { userStopped = playing; setMusic(!playing); });
+  const startOnFirstTouch = e => {
+    if (e.target === btn || playing || userStopped) return;
+    setMusic(true);
+  };
+  document.addEventListener("keydown", startOnFirstTouch);
+  document.addEventListener("pointerdown", startOnFirstTouch);
 </script>
 </body>
 </html>
