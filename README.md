@@ -19,7 +19,7 @@ Open the root `index.html` in a browser and pick a model with the arrow keys and
 - On-screen arrows light up when pressed, and a voice says the direction.
 - If your child gets stuck, the arrow they need glows. After several wrong keys, a gentle voice hint follows.
 - When Peppa lands in the puddle, it squishes, ripples spread out and mud drops arc up and fall back.
-- The weather moves one step after each puddle: sunny, cloudy, light rain, rainbow, then sunny again. Each change fades in slowly, tinting the sky and grass, bringing clouds over the sun, and adding rain or a soft rainbow.
+- The weather moves one step after each puddle: sunny, cloudy, light rain, rainbow, then sunny again. Each change fades in slowly, tinting the sky and grass, bringing clouds over the sun, and adding rain or a soft rainbow. The music follows the weather. It turns slower, softer and more muffled when cloudy, and dreamy in the rain, with a held chord and little "raindrop" plinks. When the rainbow comes out, it plays a harp run and brightens up.
 - There's no way to lose. Wrong keys and bumping into edges are harmless.
 - The built-in music is an original tune that reacts to the game. It gets calmer while waiting, bouncier while walking and twinkly near the puddle. The key changes after each splash, and a soft beat joins in at level 2.
 - The 🎵 button (mouse only) turns music on and off. Press Esc to leave full screen.

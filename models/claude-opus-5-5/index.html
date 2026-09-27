@@ -298,7 +298,17 @@
   // ---------- Weather ----------
   // One step after each puddle, so it changes with progress, never mid-thought.
   const WEATHER = ["sunny", "cloudy", "rain", "rainbow", "sunny"];
-  function setWeather() { document.body.dataset.weather = WEATHER[state.score % WEATHER.length]; }
+  function setWeather() {
+    const w = WEATHER[state.score % WEATHER.length], changed = document.body.dataset.weather !== w;
+    document.body.dataset.weather = w;
+    if (!ctx || !changed) return;
+    // Glide the music's brightness to suit the new weather.
+    musicTone.frequency.setTargetAtTime(MOODS[w].cutoff, ctx.currentTime, 1.2);
+    // The rainbow arrives with a soft harp-like run.
+    if (w === "rainbow" && musicOn)
+      [0, 4, 7, 12, 16, 19, 24, 28].forEach((n, i) =>
+        note(hz(60 + musicKey + n), { dur: 0.9, vol: 0.05, at: 0.6 + i * 0.08, bus: musicBus }));
+  }
   const CLOUD_SVG = `<svg viewBox="0 0 100 50"><g fill="#fff">
     <circle cx="30" cy="30" r="17"/><circle cx="54" cy="22" r="21"/><circle cx="76" cy="31" r="14"/>
     <rect x="18" y="30" width="70" height="18" rx="9"/></g></svg>`;
@@ -336,7 +346,23 @@
   // Everything goes through a gentle limiter so nothing gets loud or sharp.
   // Sound effects and music have separate volume knobs.
   const SFX_VOLUME = 0.5, MUSIC_VOLUME = 0.35, MUSIC_DUCKED = 0.12;
-  let ctx = null, sfxBus, musicBus;
+  let ctx = null, sfxBus, musicBus, musicTone;
+
+  // The music's mood follows the weather: same song, different feel.
+  //   tempo:  multiplies the beat length (bigger = slower)
+  //   cutoff: brightness of the sound (lower = softer, more muffled)
+  //   melody: melody volume
+  //   bounce: off-beat chords while Peppa walks
+  //   pad:    soft held chord under the song
+  //   drops:  chance of a little "raindrop" plink on each half-beat
+  //   sparkle: melody doubled an octave up, a little brighter
+  const MOODS = {
+    sunny:   { tempo: 1,    cutoff: 3500, melody: 1,    bounce: true,  pad: 0,     drops: 0,    sparkle: 0.02 },
+    cloudy:  { tempo: 1.08, cutoff: 2200, melody: 0.85, bounce: true,  pad: 0.025, drops: 0,    sparkle: 0.01 },
+    rain:    { tempo: 1.15, cutoff: 1500, melody: 0.8,  bounce: false, pad: 0.035, drops: 0.35, sparkle: 0 },
+    rainbow: { tempo: 1,    cutoff: 3500, melody: 1,    bounce: true,  pad: 0,     drops: 0,    sparkle: 0.045 },
+  };
+  const mood = () => MOODS[document.body.dataset.weather] || MOODS.sunny;
   function audio() {
     if (!ctx) {
       ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -346,7 +372,9 @@
       soften.type = "lowpass"; soften.frequency.value = 3500;
       soften.connect(limiter).connect(ctx.destination);
       sfxBus = ctx.createGain(); sfxBus.gain.value = SFX_VOLUME; sfxBus.connect(soften);
-      musicBus = ctx.createGain(); musicBus.gain.value = MUSIC_VOLUME; musicBus.connect(soften);
+      // Music passes through its own tone control, so the weather can make it brighter or more muffled.
+      musicTone = ctx.createBiquadFilter(); musicTone.type = "lowpass"; musicTone.frequency.value = MOODS.sunny.cutoff;
+      musicBus = ctx.createGain(); musicBus.gain.value = MUSIC_VOLUME; musicBus.connect(musicTone).connect(soften);
     }
     if (ctx.state === "suspended") ctx.resume();
     return ctx;
@@ -435,7 +463,11 @@
     const root = 48 + musicKey, now = Date.now();
     const playing = now - lastMove < 3000, waiting = now - lastMove > 8000;
     const nearPuddle = !state.busy && Math.abs(state.px - state.x) + Math.abs(state.py - state.y) === 1;
-    const m = { bus: musicBus, at };
+    const m = { bus: musicBus, at }, md = mood();
+
+    // Cloudy and rainy weather: a soft held chord underneath.
+    if (md.pad && tick === 0)
+      chord.forEach(c => note(hz(root + c), { ...m, dur: beat * md.tempo * 4, vol: md.pad }));
 
     // Bass: root on beat 1, fifth on beat 3.
     if (tick === 0) note(hz(root - 12 + chord[0]), { ...m, dur: beat * 1.8, type: "triangle", vol: 0.13 });
@@ -445,15 +477,19 @@
     let pos = 0;
     for (const [n, beats] of sec.bars[bar]) {
       if (pos * 2 === tick && n) {
-        note(hz(root + n), { ...m, dur: 0.6, vol: waiting ? 0.07 : 0.12 });
-        note(hz(root + n) * 2, { ...m, dur: 0.25, vol: 0.02 });
+        note(hz(root + n), { ...m, dur: 0.6, vol: (waiting ? 0.07 : 0.12) * md.melody });
+        if (md.sparkle) note(hz(root + n) * 2, { ...m, dur: 0.3, vol: md.sparkle });
       }
       pos += beats;
     }
 
     // While Peppa is on the move: bouncy off-beat chords.
-    if (playing && (tick === 2 || tick === 6))
+    if (md.bounce && playing && (tick === 2 || tick === 6))
       chord.forEach(c => note(hz(root + 12 + c), { ...m, dur: 0.18, type: "triangle", vol: 0.035 }));
+
+    // Rain: the odd soft high "plink", like drops on a window.
+    if (Math.random() < md.drops)
+      note(hz(root + 24 + chord[Math.floor(Math.random() * 3)]), { ...m, dur: 0.15, vol: 0.025 });
 
     // One step from the puddle: a twinkly rising arpeggio to build excitement.
     if (nearPuddle)
@@ -470,7 +506,7 @@
     const a = audio();
     while (nextTime < a.currentTime + 0.4) {
       playTick(Math.max(0, nextTime - a.currentTime));
-      nextTime += beat / 2;
+      nextTime += beat * mood().tempo / 2;
       if (++tick === 8) {
         tick = 0;
         if (++bar === 4) { bar = 0; secIdx = (secIdx + 1) % ORDER.length; }
