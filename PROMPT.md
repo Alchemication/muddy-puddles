@@ -4,8 +4,7 @@ Games tagged **single-shot** come from this prompt in one message, with no follo
 
 ```
 Build a Peppa Pig game as a single self-contained HTML file (no external
-files, libraries, images or audio files) that teaches my 2-year-old to use
-the arrow keys.
+files, libraries, images or audio files) that teaches a toddler (3-4 years old) to use the arrow keys.
 
 The idea
 - Peppa walks around a field, one step per arrow key, to jump into muddy
