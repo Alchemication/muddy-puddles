@@ -1,4 +1,4 @@
-# Muddy Puddle 🐷
+# Muddy Puddles 🐷
 
 A toddler-friendly browser game that teaches the arrow keys. Each version is one HTML file with no dependencies, made by an AI model from the same [prompt](PROMPT.md). This repo collects the versions so people can play them and compare. Each one is tagged [single-shot or optimised](#single-shot-and-optimised).
 
@@ -6,7 +6,7 @@ Walk Peppa to the muddy puddle with the arrow keys. Each splash earns a ⭐.
 
 ## Play
 
-**Online:** https://alchemication.github.io/muddy-puddle/. It's redeployed automatically on every push to `main` that changes the games.
+**Online:** https://alchemication.github.io/muddy-puddles/. It's redeployed automatically on every push to `main` that changes the games.
 
 **Locally:** open the root `index.html` in a browser and pick a model with the arrow keys and Enter, or with a click.
 
