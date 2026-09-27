@@ -47,7 +47,7 @@ Peppa
   swinging legs when she walks.
 - After a splash she cheers with her arms up and gets mud spots that fade by
   the next puddle.
-- In the rain she looks up at the sky now and then.
+- In rain, storms and snow she looks up at the sky now and then.
 
 Background
 - A soft parallax landscape behind the field: hazy far hills, a nearer
@@ -57,17 +57,22 @@ Background
   different; a new landscape cross-fades in.
 
 Weather
-- It moves one step per puddle, never mid-move: sunny, cloudy, light rain,
-  rainbow, then sunny again.
-- Each change fades slowly: sky and grass colour, clouds over the sun, light
-  rain over the field (not over the arrows), and a soft rainbow.
+- It moves one step per puddle, never mid-move. Round 1: sunny, cloudy, light
+  rain, thunderstorm, rainbow. Round 2: sunny, cloudy, snow, snow, cloudy.
+- Each change fades slowly: sky and grass colour, clouds over the sun, rain
+  or snowflakes over the field (not over the arrows), and a soft rainbow.
+- Thunder must be safe for young eyes and ears: never a flash, just a soft
+  glow in the sky, a faint cartoon bolt, and a quiet, deep, far-away rumble.
+- Snow turns the field a soft blue-white (not glaring white), with slow
+  drifting flakes and frosted hills and trees.
 
 Splash
 - Always subtle and timed to her landing: the puddle squishes, ripples spread
   out, and mud drops arc up and fall back.
 - It suits the weather. Cloudy: a darker puddle and a few more drops. Rain:
   a fuller puddle with raindrop rings on it, and a bigger, wetter splash.
-  Rainbow: a faint rainbow sheen, and some drops twinkle in rainbow colours.
+  Storm: like rain. Rainbow: a faint rainbow sheen, and some drops twinkle
+  in rainbow colours. Snow: some of the drops are snow.
 
 Sound and music
 - Every sound is soft and gentle, never harsh or buzzy.
@@ -78,7 +83,9 @@ Sound and music
   It changes key after each puddle, plays a small fanfare after each round,
   and adds a soft beat in level 2.
 - The music suits the weather: slower and softer when cloudy, dreamy with
-  raindrop plinks in the rain, bright with a harp run for the rainbow.
+  raindrop plinks in the rain, gently minor and muffled in the storm, bright
+  with a harp run for the rainbow, and slow and twinkly with bell-like chimes
+  and a falling celesta run for snow.
 - Sound effects are in the music's key.
 - A small music on/off button that responds only to the mouse or touch.
 

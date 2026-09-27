@@ -46,13 +46,15 @@ The selection page has its own friendly background tune, which starts on the fir
 - She's subtly alive: she breathes, blinks and wags her tail, and hops with swinging legs when she walks.
 - When your child is stuck, she turns toward the puddle and waves at it, alongside the glowing arrow.
 - After a splash she cheers with her arms up and gets mud spots, which fade by the next puddle.
-- In the rain she looks up at the sky now and then.
+- In rain, storms and snow she looks up at the sky now and then.
 
 ### Splash
 When Peppa lands in the puddle, it squishes, ripples spread out and mud drops arc up and fall back. It's timed to her landing, together with a soft "bloop" and a rising chime. The splash suits the weather:
 - **Cloudy:** a darker puddle and a few more drops.
 - **Rain:** the puddle fills up and gets little raindrop rings. The splash is bigger and wetter, with a deeper bloop.
+- **Storm:** like rain.
 - **Rainbow:** a faint rainbow sheen on the puddle, and some drops twinkle in rainbow colours ✨.
+- **Snow:** some of the drops are snow.
 
 ### Background
 - A soft **parallax** landscape sits behind the field: hazy far hills, a nearer horizon with a few trees, and grass tufts and little flowers.
@@ -62,11 +64,16 @@ When Peppa lands in the puddle, it squishes, ripples spread out and mud drops ar
 - Devices set to reduce motion get no sliding and no drifting clouds.
 
 ### Weather
-The weather moves one step after each puddle: ☀️ sunny → ⛅ cloudy → 🌧️ light rain → 🌈 rainbow → ☀️ sunny. Each change fades over about 3 seconds:
-- The sky and grass change colour.
-- Clouds drift in and cover the sun.
-- Light rain falls over the field only, never over the arrow keys.
-- A soft rainbow appears after the rain.
+The weather moves one step after each puddle, over two rounds:
+- **Round 1:** ☀️ sunny → ⛅ cloudy → 🌧️ light rain → ⛈️ thunderstorm → 🌈 rainbow
+- **Round 2:** ☀️ sunny → ⛅ cloudy → ❄️ snow → ❄️ snow → ⛅ cloudy
+
+Each change fades over about 3 seconds:
+- The sky and grass change colour, and clouds drift in and cover the sun.
+- Rain and snowflakes fall over the field only, never over the arrow keys.
+- **Thunder is safe for young eyes and ears.** There's never a flash: the sky glows softly, a faint cartoon bolt fades in and out, and a quiet, deep rumble follows, about every 9–15 seconds.
+- **Snow** turns the field a soft blue-white rather than glaring white, with slowly drifting flakes and frosted hills and trees.
+- A soft rainbow appears after the storm.
 
 ### Sound and music
 - Every sound is soft. Notes fade in and out, and everything goes through a limiter and a gentle high-frequency cut.
@@ -74,7 +81,7 @@ The weather moves one step after each puddle: ☀️ sunny → ⛅ cloudy → �
   - It's calmer while your child is thinking, bouncier while Peppa walks, and twinkly when she's one step from the puddle.
   - It changes key after each puddle and plays a fanfare at the end of each round.
   - In level 2, a soft beat joins in and the tempo picks up slightly.
-- **The music follows the weather.** Cloudy makes it a little slower and softer, with a held chord. Rain makes it dreamy, with little "raindrop" plinks. The rainbow brings a harp run and extra sparkle.
+- **The music follows the weather.** Cloudy makes it a little slower and softer, with a held chord. Rain makes it dreamy, with little "raindrop" plinks. The storm turns it gently minor and muffled. The rainbow brings a harp run and extra sparkle. Snow makes it slow and twinkly, with bell-like chimes and a falling celesta run as it arrives.
 - Sound effects play in the music's current key, so everything fits together.
 - The 🎵 button turns music on and off. It only responds to the mouse, so key-mashing can't switch it off.
 
