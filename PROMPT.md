@@ -32,8 +32,9 @@ Must-haves
 Make it delightful
 Beyond that, be creative and decide the details yourself. Think about what
 would make a toddler smile and keep playing: a Peppa who feels alive,
-satisfying splashes, a world that changes as they play, music that reacts to
-what's happening. Keep every effect subtle and in service of learning the
+satisfying splashes, a world that changes and comes alive as they play, with
+little surprises that are never quite the same twice, and music that reacts
+to what's happening. Keep every effect subtle and in service of learning the
 keys.
 
 Finish with a short explanation, for a parent, of how the game works and what

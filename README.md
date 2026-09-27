@@ -63,7 +63,18 @@ When Peppa lands in the puddle, it squishes, ripples spread out and mud drops ar
 - When Peppa walks, the layers slide slightly, far ones least, which gives gentle depth.
 - The landscape is **generated**, so every game looks a little different, and each new round cross-fades to a new one.
 - Its colours are mixed from the sky and grass colours, so it stays pastel and follows the weather.
+- It's dotted with red-capped toadstools, bushes and flowers. The flowers and toadstools hide under the snow.
 - Devices set to reduce motion get no sliding and no drifting clouds.
+
+### Visitors
+Every 7–16 seconds a small animal may wander by. It always stays behind the playing field and moves slowly, and there are never more than two at once:
+- hedgehogs that stop to sniff, hopping rabbits, trotting foxes and slow snails, on the horizon or in the meadow
+- birds crossing the sky, sometimes in twos or threes
+- pastel butterflies in random colours, which flutter off when the weather turns
+- a robin hopping through the snow
+- a frog that pops up beside the puddle in the rain
+
+Who comes out depends on the weather: in a storm, only frogs and snails. Every visit picks its own path, speed, direction and stops, and the same animal never comes twice in a row. Devices set to reduce motion get no visitors.
 
 ### Weather
 The weather moves one step after each puddle, over two rounds:

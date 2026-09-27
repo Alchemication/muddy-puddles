@@ -61,6 +61,30 @@
   }
   .scene .layer.near { height: 100%; opacity: .6; }
   .scene path, .scene circle, .scene rect { transition: fill 3s, stroke 3s; }
+  /* Flowers and toadstools hide under the snow. */
+  .scene .flower, .scene .mushroom { transition: opacity 3s; }
+  body[data-weather="snow"] .scene .flower, body[data-weather="snow"] .scene .mushroom { opacity: 0; }
+
+  /* ---------- Visitors: small animals wandering by ---------- */
+  .critters { pointer-events: none; }
+  .visitor { position: absolute; left: 0; top: 0; pointer-events: none; opacity: 0; transition: opacity .8s; }
+  .visitor.here { opacity: .95; }
+  .visitor .face, .visitor .gait, .visitor svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .visitor.left .face { transform: scaleX(-1); }
+  .visitor.moving .gait.hop { animation: vhop .55s ease-in-out infinite; }
+  .visitor.moving .gait.trot { animation: vtrot .32s ease-in-out infinite; }
+  .visitor.moving .gait.creep { animation: vcreep 1.6s ease-in-out infinite; }
+  .visitor .wing { transform-box: fill-box; transform-origin: 50% 100%; animation: vflap .32s ease-in-out infinite alternate; }
+  .visitor .wings { transform-box: fill-box; transform-origin: 50% 50%; animation: vflutter .2s ease-in-out infinite alternate; }
+  .visitor.sniff .gait { animation: vsniff 1.2s ease-in-out infinite; transform-origin: 80% 100%; }
+  #field > .visitor { z-index: 1; }
+  #sky > .visitor { z-index: 1; }
+  @keyframes vhop { 0%, 100% { transform: translateY(0); } 45% { transform: translateY(-35%); } }
+  @keyframes vtrot { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6%); } }
+  @keyframes vcreep { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(1.05); } }
+  @keyframes vflap { from { transform: scaleY(1); } to { transform: scaleY(-.7); } }
+  @keyframes vflutter { from { transform: scaleX(1); } to { transform: scaleX(.3); } }
+  @keyframes vsniff { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(4deg); } }
 
   /* Devices set to reduce motion: no drifting or sliding at all. */
   @media (prefers-reduced-motion: reduce) {
@@ -470,6 +494,8 @@
   function setWeather() {
     const w = WEATHER[state.score % WEATHER.length], changed = document.body.dataset.weather !== w;
     document.body.dataset.weather = w;
+    // Butterflies flutter off when the weather turns wet or cold.
+    if (["rain", "storm", "snow"].includes(w)) document.querySelectorAll(".visitor.butterfly").forEach(leave);
     if (!ctx || !changed) return;
     // Glide the music's brightness to suit the new weather.
     musicTone.frequency.setTargetAtTime(MOODS[w].cutoff, ctx.currentTime, 1.2);
@@ -816,7 +842,30 @@
         + `<circle cx="${x}" cy="${y - size * 0.7}" r="${size * 0.38}" style="fill: color-mix(in srgb, var(--grass) ${leaf}%, #3d6b36)"/>`
         + `<circle cx="${x - size * 0.22}" cy="${y - size * 0.52}" r="${size * 0.26}" style="fill: color-mix(in srgb, var(--grass) ${leaf + 10}%, #3d6b36)"/>`;
     }
+    // A few soft bushes on the horizon.
+    for (let i = 0, n = 1 + Math.floor(rand() * 3); i < n; i++) {
+      const x = between(0.05, 0.95) * W, y = mid(x) + 3, size = band * between(0.12, 0.2);
+      const leaf = Math.round(between(62, 78));
+      trees += `<g><circle cx="${x - size * 0.6}" cy="${y - size * 0.35}" r="${size * 0.55}" style="fill: color-mix(in srgb, var(--grass) ${leaf}%, #3d6b36)"/>`
+        + `<circle cx="${x + size * 0.5}" cy="${y - size * 0.3}" r="${size * 0.5}" style="fill: color-mix(in srgb, var(--grass) ${leaf}%, #3d6b36)"/>`
+        + `<circle cx="${x}" cy="${y - size * 0.6}" r="${size * 0.65}" style="fill: color-mix(in srgb, var(--grass) ${leaf + 8}%, #3d6b36)"/></g>`;
+    }
+    // A toadstool: soft red cap with white spots.
+    const toadstool = (x, y, h) => `<g class="mushroom">
+        <rect x="${x - h * 0.13}" y="${y - h * 0.6}" width="${h * 0.26}" height="${h * 0.6}" rx="${h * 0.08}" style="fill: #f4ead9"/>
+        <path d="M${x - h * 0.5} ${y - h * 0.52} Q${x} ${y - h * 1.25} ${x + h * 0.5} ${y - h * 0.52} Z" style="fill: #e58f86"/>
+        <circle cx="${x - h * 0.18}" cy="${y - h * 0.72}" r="${h * 0.07}" style="fill: #fff8f0"/>
+        <circle cx="${x + h * 0.15}" cy="${y - h * 0.82}" r="${h * 0.06}" style="fill: #fff8f0"/>
+        <circle cx="${x + h * 0.02}" cy="${y - h * 0.62}" r="${h * 0.05}" style="fill: #fff8f0"/></g>`;
+    if (rand() < 0.7) { const x = between(0.1, 0.9) * W; trees += toadstool(x, mid(x) + 2, band * 0.1); }
+
     let near = "";
+    // Little groups of toadstools in the meadow.
+    for (let i = 0, n = 2 + Math.floor(rand() * 3); i < n; i++) {
+      const x = rand() * W, y = between(bandH + 24, H - 6), h = between(20, 30);
+      near += toadstool(x, y, h);
+      if (rand() < 0.6) near += toadstool(x + h * between(0.6, 0.9), y + 2, h * between(0.55, 0.75));
+    }
     const FLOWERS = ["#f6c3d6", "#fbe9a6", "#ffffff", "#dccaf2"];
     for (let i = 0, n = Math.round(W / 70); i < n; i++) {
       const x = rand() * W, y = between(bandH + 10, H - 6);
@@ -825,8 +874,8 @@
         near += `<path d="M${x - t * 0.5} ${y} l${t * 0.3} ${-t} M${x} ${y} l0 ${-t * 1.2} M${x + t * 0.5} ${y} l${-t * 0.3} ${-t}"
           style="fill: none; stroke: color-mix(in srgb, var(--grass) 70%, #3d6b36)" stroke-width="2" stroke-linecap="round"/>`;
       } else {
-        near += `<circle cx="${x}" cy="${y}" r="${between(3, 4.5)}" style="fill: ${FLOWERS[Math.floor(rand() * FLOWERS.length)]}"/>`
-          + `<circle cx="${x}" cy="${y}" r="1.4" style="fill: #f2cf6b"/>`;
+        near += `<g class="flower"><circle cx="${x}" cy="${y}" r="${between(3, 4.5)}" style="fill: ${FLOWERS[Math.floor(rand() * FLOWERS.length)]}"/>`
+          + `<circle cx="${x}" cy="${y}" r="1.4" style="fill: #f2cf6b"/></g>`;
       }
     }
 
@@ -837,7 +886,11 @@
         <path d="${outline(far, bandH)}" style="fill: color-mix(in srgb, var(--grass) ${haze}%, var(--sky))"/>`) +
       // The horizon's grass runs a little past its edge, so it meets the field without a seam.
       layer("mid", bandH, `<path d="${outline(mid, bandH + 8)}" style="fill: var(--grass)"/>${trees}`) +
-      layer("near", H, near);
+      layer("near", H, near) +
+      // Places for visitors: on the horizon (moves with it) and in the meadow.
+      `<div class="layer critters" data-depth="mid" style="height: ${bandH}px; transform: ${layerShift("mid")}"></div>` +
+      `<div class="layer critters" data-depth="near" style="height: 100%; transform: ${layerShift("near")}"></div>`;
+    scene.info = { W, H, band, mid };
 
     const old = [...scenery.children];
     if (sceneFade && old.length) { // a new round: cross-fade to the new landscape
@@ -851,6 +904,187 @@
       scenery.append(scene);
     }
     sceneFade = false;
+  }
+
+  // ---------- Visitors ----------
+  // Now and then a small animal wanders by, behind the field: a hedgehog that
+  // stops to sniff, a hopping rabbit, a fox, a snail, birds, butterflies, a
+  // robin in the snow, a frog by the puddle in the rain. Each visit picks its
+  // own path, speed, direction and pauses, so it's never quite the same.
+  const CRITTERS = {
+    hedgehog: { where: "ground", gait: "trot", size: 1, secs: [24, 32], pauses: true, svg: `
+      <ellipse cx="18" cy="21" rx="14" ry="8" fill="#8a6a4c"/>
+      <path d="M4 21 L6 13 L9 17 L11 10 L14 15 L17 8 L20 14 L23 9 L25 15 L28 12 L30 20 Z" fill="#6f533b"/>
+      <path d="M27 16 Q35 18 38 23 Q33 26 27 25 Z" fill="#e6cda8"/>
+      <circle cx="38" cy="23" r="1.4" fill="#3a2a20"/><circle cx="31" cy="19.5" r="1.1" fill="#3a2a20"/>
+      <rect x="10" y="27" width="3" height="3" rx="1" fill="#5a4432"/><rect x="22" y="27" width="3" height="3" rx="1" fill="#5a4432"/>` },
+    fox: { where: "ground", gait: "trot", size: 1.3, secs: [13, 19], pauses: false, svg: `
+      <ellipse cx="6" cy="14" rx="7" ry="3.5" fill="#e8894a" transform="rotate(-25 6 14)"/><circle cx="1" cy="11" r="2.6" fill="#fff4e8"/>
+      <ellipse cx="18" cy="18" rx="10" ry="6" fill="#e8894a"/>
+      <rect x="11" y="21" width="2.5" height="8" rx="1" fill="#5a3b2a"/><rect x="16" y="22" width="2.5" height="7" rx="1" fill="#5a3b2a"/>
+      <rect x="22" y="21" width="2.5" height="8" rx="1" fill="#5a3b2a"/>
+      <path d="M25 13 L37 17 L26 21 Z" fill="#e8894a"/><path d="M26 14 L28 7 L31 14 Z" fill="#d9763a"/>
+      <path d="M30 18 L37 17 L31 20.5 Z" fill="#fff4e8"/>
+      <circle cx="30" cy="15.5" r="1.1" fill="#2d2420"/><circle cx="37" cy="17" r="1.1" fill="#2d2420"/>` },
+    rabbit: { where: "ground", gait: "hop", size: 0.9, secs: [15, 22], pauses: true, svg: `
+      <ellipse cx="17" cy="21" rx="10" ry="7" fill="#c7ad93"/>
+      <ellipse cx="26" cy="5" rx="2.2" ry="7" fill="#c7ad93" transform="rotate(-12 26 5)"/>
+      <ellipse cx="29.5" cy="5" rx="2.2" ry="7" fill="#b89c82" transform="rotate(8 29.5 5)"/>
+      <circle cx="28" cy="15" r="6" fill="#c7ad93"/><circle cx="6.5" cy="19" r="3.5" fill="#fbf6ef"/>
+      <circle cx="31" cy="14" r="1.1" fill="#2d2420"/><circle cx="34" cy="16.5" r="1" fill="#e9a3b0"/>
+      <ellipse cx="22" cy="27" rx="4" ry="2" fill="#b89c82"/>` },
+    snail: { where: "ground", gait: "creep", size: 0.7, secs: [45, 60], pauses: true, svg: `
+      <path d="M4 26 Q20 22 36 26 Q38 28 34 29 L6 29 Q2 28 4 26 Z" fill="#d9c4a2"/>
+      <circle cx="17" cy="17" r="9" fill="#e0a95e"/>
+      <path d="M12 17 a5 5 0 1 0 5 -5 a3 3 0 1 0 3 3" fill="none" stroke="#b9823f" stroke-width="1.6"/>
+      <path d="M33 25 L35 17 M35 25 L38 18" stroke="#c9b28e" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="35" cy="17" r="1" fill="#6b5a45"/><circle cx="38" cy="18" r="1" fill="#6b5a45"/>` },
+    robin: { where: "ground", gait: "hop", size: 0.6, secs: [16, 24], pauses: true, svg: `
+      <path d="M9 16 L2 13 L4 19 Z" fill="#735a43"/>
+      <line x1="18" y1="25" x2="17" y2="29" stroke="#6b5040" stroke-width="1.3"/>
+      <line x1="22" y1="25" x2="22" y2="29" stroke="#6b5040" stroke-width="1.3"/>
+      <ellipse cx="19" cy="18" rx="10" ry="8" fill="#8a6d52"/><circle cx="28" cy="12" r="5.5" fill="#8a6d52"/>
+      <ellipse cx="25" cy="19" rx="5.5" ry="5" fill="#e98a5f"/>
+      <path d="M33 12 L37 13 L33 14 Z" fill="#e2b04a"/><circle cx="29.5" cy="11" r="1" fill="#241c16"/>` },
+    bird: { where: "sky", gait: "flap", size: 1, secs: [16, 26], svg: `
+      <path d="M12 16 L5 13 L7 18 Z" fill="#6f829b"/>
+      <ellipse cx="20" cy="17" rx="9" ry="5" fill="#7f93ad"/><circle cx="28" cy="14" r="4" fill="#7f93ad"/>
+      <path d="M31.5 14 L35 15 L31.5 16 Z" fill="#e2b04a"/><circle cx="29" cy="13" r=".9" fill="#222"/>
+      <g class="wing"><path d="M15 15 Q20 3 26 14 Z" fill="#94a7c0"/></g>` },
+    butterfly: { where: "air", gait: "flutter", size: 1, secs: [16, 24], svg: () => {
+      const hue = Math.floor(Math.random() * 360), a = `hsl(${hue} 70% 82%)`, b = `hsl(${(hue + 40) % 360} 70% 86%)`;
+      return `<g class="wings"><ellipse cx="14" cy="11" rx="9" ry="7" fill="${a}"/><ellipse cx="26" cy="11" rx="9" ry="7" fill="${a}"/>
+        <ellipse cx="15" cy="21" rx="6" ry="5" fill="${b}"/><ellipse cx="25" cy="21" rx="6" ry="5" fill="${b}"/></g>
+        <rect x="19" y="7" width="2" height="17" rx="1" fill="#7a687c"/>`; } },
+    frog: { where: "puddle", gait: "hop", size: 1, svg: `
+      <ellipse cx="9" cy="28" rx="5" ry="2" fill="#74ad69"/><ellipse cx="31" cy="28" rx="5" ry="2" fill="#74ad69"/>
+      <ellipse cx="20" cy="21" rx="12" ry="8" fill="#86c07a"/>
+      <circle cx="14" cy="12" r="4.5" fill="#86c07a"/><circle cx="26" cy="12" r="4.5" fill="#86c07a"/>
+      <circle cx="14" cy="11.5" r="2.4" fill="#fff"/><circle cx="26" cy="11.5" r="2.4" fill="#fff"/>
+      <circle cx="14.5" cy="12" r="1.2" fill="#253022"/><circle cx="26.5" cy="12" r="1.2" fill="#253022"/>
+      <path d="M14 22 Q20 26 26 22" stroke="#4f8a46" stroke-width="1.4" fill="none" stroke-linecap="round"/>` },
+  };
+  Object.entries(CRITTERS).forEach(([kind, c]) => { c.kind = kind; });
+  // Who comes out in which weather.
+  const VISITORS = {
+    sunny:   ["butterfly", "bird", "hedgehog", "fox", "rabbit", "snail"],
+    cloudy:  ["bird", "hedgehog", "fox", "rabbit", "snail"],
+    rain:    ["frog", "snail", "frog", "bird"],
+    storm:   ["frog", "snail"],
+    rainbow: ["butterfly", "bird", "rabbit", "hedgehog", "butterfly"],
+    snow:    ["robin", "fox", "rabbit", "bird"],
+  };
+  let lastVisitor = null;
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+  function makeVisitor(c, size, parent) {
+    const el = document.createElement("div");
+    el.className = "visitor " + c.kind;
+    Object.assign(el.style, { width: size + "px", height: size * 0.75 + "px" });
+    el.innerHTML = `<div class="face"><div class="gait ${c.gait}"><svg viewBox="0 0 40 30">${
+      typeof c.svg === "function" ? c.svg() : c.svg}</svg></div></div>`;
+    parent.append(el);
+    requestAnimationFrame(() => el.classList.add("here"));
+    return el;
+  }
+  async function leave(el) {
+    el.classList.remove("here");
+    await wait(900);
+    el.remove();
+  }
+
+  // Walks along the horizon (or the meadow below the spots), with pauses.
+  async function walkBy(c) {
+    const scene = scenery.lastElementChild;
+    if (!scene?.info) return;
+    const { W, H, band, mid } = scene.info, [onHorizon, inMeadow] = scene.querySelectorAll(".critters");
+    const useMeadow = offY > cell * 0.55 && Math.random() < 0.5;
+    const size = (useMeadow ? Math.min(cell * 0.42, offY * 0.55) : Math.max(16, Math.min(band * 0.5, cell * 0.4))) * c.size;
+    const h = size * 0.75, parent = useMeadow ? inMeadow : onHorizon;
+    const yAt = useMeadow ? (() => { const y = H - offY / 2 - h / 2; return () => y; })() : x => mid(x + size / 2) - h + 3;
+    const dir = Math.random() < 0.5 ? 1 : -1, from = dir > 0 ? -size : W, to = dir > 0 ? W : -size;
+    const secs = c.secs[0] + Math.random() * (c.secs[1] - c.secs[0]);
+    const el = makeVisitor(c, size, parent);
+    el.classList.toggle("left", dir < 0);
+    // Break the walk into a few stretches, with a little stop between some.
+    const stops = c.pauses ? 1 + Math.floor(Math.random() * 3) : 0;
+    const points = [from, ...Array.from({ length: stops }, () => from + (to - from) * (0.2 + Math.random() * 0.6)).sort((a, b) => dir * (a - b)), to];
+    for (let i = 0; i < points.length - 1; i++) {
+      const a = points[i], b = points[i + 1], frames = [];
+      for (let k = 0; k <= 12; k++) { const x = a + (b - a) * k / 12; frames.push({ transform: `translate(${x}px, ${yAt(x)}px)` }); }
+      el.classList.add("moving");
+      try { await el.animate(frames, { duration: secs * 1000 * Math.abs(b - a) / Math.abs(to - from), fill: "forwards" }).finished; } catch { return; }
+      el.classList.remove("moving");
+      if (!el.isConnected) return;
+      if (i < points.length - 2) {
+        el.classList.add("sniff");
+        await wait(1200 + Math.random() * 2000);
+        el.classList.remove("sniff");
+      }
+    }
+    el.remove();
+  }
+
+  // Birds cross the sky, now and then in twos or threes.
+  function flyBy(c) {
+    const sky = $("#sky"), sw = sky.clientWidth, sh = sky.clientHeight;
+    const dir = Math.random() < 0.5 ? 1 : -1, flock = Math.random() < 0.35 ? 2 + Math.floor(Math.random() * 2) : 1;
+    const secs = c.secs[0] + Math.random() * (c.secs[1] - c.secs[0]), baseY = sh * (0.15 + Math.random() * 0.35);
+    for (let b = 0; b < flock; b++) {
+      const size = sh * (0.28 + Math.random() * 0.08), el = makeVisitor(c, size, sky);
+      el.classList.toggle("left", dir < 0);
+      const from = dir > 0 ? -size * (1 + b * 1.4) : sw + size * b * 1.4, to = dir > 0 ? sw + size : -size * 2;
+      const y0 = baseY + b * size * 0.5, wob = size * 0.3, phase = Math.random() * 6, frames = [];
+      for (let k = 0; k <= 16; k++) {
+        const x = from + (to - from) * k / 16;
+        frames.push({ transform: `translate(${x}px, ${y0 + Math.sin(k / 2 + phase) * wob}px)` });
+      }
+      el.animate(frames, { duration: secs * 1000, fill: "forwards" }).finished.then(() => el.remove(), () => {});
+    }
+  }
+
+  // A butterfly flutters across in a gentle wave (only in fine weather).
+  function flutterBy(c) {
+    const fw = field.clientWidth, fh = field.clientHeight, size = Math.max(22, cell * 0.28);
+    const dir = Math.random() < 0.5 ? 1 : -1, el = makeVisitor(c, size, field);
+    const from = dir > 0 ? -size : fw, to = dir > 0 ? fw : -size;
+    const y0 = fh * (0.1 + Math.random() * 0.7), wob = cell * 0.35, phase = Math.random() * 6, frames = [];
+    for (let k = 0; k <= 24; k++) {
+      const x = from + (to - from) * k / 24;
+      frames.push({ transform: `translate(${x}px, ${y0 + Math.sin(k / 2.2 + phase) * wob}px)` });
+    }
+    const secs = c.secs[0] + Math.random() * (c.secs[1] - c.secs[0]);
+    el.animate(frames, { duration: secs * 1000, fill: "forwards" }).finished.then(() => el.remove(), () => {});
+  }
+
+  // In the rain, a frog pops up beside the puddle, hops a little, and goes.
+  async function frogVisit(c) {
+    if (state.busy) return;
+    const r = puddle.getBoundingClientRect(), f = field.getBoundingClientRect(), size = cell * 0.3;
+    const side = Math.random() < 0.5 ? -1 : 1;
+    const x = r.left - f.left + r.width / 2 + side * r.width * 0.55 - size / 2, y = r.top - f.top + r.height * 0.55 - size * 0.6;
+    const el = makeVisitor(c, size, field);
+    el.style.transform = `translate(${x}px, ${y}px)`;
+    await wait(1800 + Math.random() * 1500);
+    el.classList.add("moving");
+    await wait(1100);
+    el.classList.remove("moving");
+    await wait(1500 + Math.random() * 1500);
+    await leave(el);
+  }
+
+  function spawnVisitor() {
+    if (!state.started || reduceMotion || document.hidden) return;
+    if (document.querySelectorAll(".visitor").length >= 2) return;
+    const pool = (VISITORS[document.body.dataset.weather] || []).filter(n => n !== lastVisitor);
+    if (!pool.length) return;
+    const name = pick(pool), c = CRITTERS[name];
+    lastVisitor = name;
+    ({ ground: walkBy, sky: flyBy, air: flutterBy, puddle: frogVisit })[c.where](c);
+  }
+  function visitorLoop(delay) {
+    setTimeout(() => { spawnVisitor(); visitorLoop(7000 + Math.random() * 9000); }, delay);
   }
 
   function layout() {
@@ -1145,6 +1379,7 @@
   function start() {
     if (state.started) return;
     state.started = true;
+    visitorLoop(4000);
     unlockPhoneAudio();
     audio();
     $("#start").remove();
