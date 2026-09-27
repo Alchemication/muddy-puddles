@@ -4,90 +4,38 @@ Every game in this repo is generated from this prompt in a single shot: one mess
 
 ```
 Build a Peppa Pig game as a single self-contained HTML file (no external
-files, libraries or audio files) that teaches my 2-year-old the arrow keys.
-Keep it large, simple and clear, and gentle on young eyes: soft pastel
-colours, low contrast, nothing flashing or fast, and no motion for devices set
-to reduce motion. Draw Peppa yourself and compose original music; don't copy
-the show's artwork or theme tune.
+files, libraries, images or audio files) that teaches my 2-year-old to use
+the arrow keys.
 
-Gameplay
-- The arrow keys walk Peppa one step at a time across a grassy field to a
-  muddy puddle. When she lands in it: a splash, a happy chime, a star is
-  added, and a new puddle appears somewhere else.
-- Level 1 is one row, so only left and right are needed. After 5 puddles the
-  field grows to 3 rows and up and down join in.
-- No way to lose. Walking into an edge makes Peppa wiggle, holding a key
-  moves her only one step, and Space makes her jump and oink.
+The idea
+- Peppa walks around a field, one step per arrow key, to jump into muddy
+  puddles. Each puddle is a small celebration, then a new one appears.
+- Start with just left and right, and add up and down once my child is ready.
+- It also works on phones and tablets by swiping.
 
-Teaching
-- Big on-screen arrows laid out like a keyboard. They light up when pressed
-  and can be clicked or tapped.
-- Each direction has its own soft chime.
-- After a few idle seconds, the needed arrow glows and Peppa turns and waves
-  toward the puddle.
-- Wrong keys: the needed arrow glows at once. Only after several misses in a
-  row does a soft "over here" chime play and that arrow bounce, at most once
-  every few seconds.
+Must-haves
+- Large, simple and clear. No way to lose, and no time pressure.
+- Help a stuck toddler gently, never tell them off: show which key to press.
+- Toddler-proof: mashing keys, holding keys or tapping everywhere can't break
+  the game or leave the page, but an adult can still get out with Esc.
+- Gentle on young eyes and ears: soft pastel colours, nothing flashing or
+  fast, no harsh or loud sounds, and no motion for devices set to reduce
+  motion.
+- No speech or computer voices, which sound robotic. Use sounds, music and
+  animation instead.
+- Sound works on phones too, including an iPhone with its silent switch on.
+  Add a music on/off button that only responds to the mouse or touch.
+- Fits any screen, including an upright phone, without scrolling or zooming.
+- Draw Peppa yourself and compose original music; don't copy the show's
+  artwork or theme tune.
 
-Toddler-proofing
-- A big Play button starts sound and full screen.
-- Block keys that scroll or change the page; Esc and normal shortcuts still
-  work for adults.
-- Fits any screen without scrolling.
+Make it delightful
+Beyond that, be creative and decide the details yourself. Think about what
+would make a toddler smile and keep playing: a Peppa who feels alive,
+satisfying splashes, a world that changes as they play, music that reacts to
+what's happening. Keep every effect subtle and in service of learning the
+keys.
 
-Phones and tablets
-- Swiping anywhere moves Peppa (a tap is not a swipe).
-- Held upright, the arrows go under the field, sized to the screen width.
-- The page never scrolls, zooms or pull-to-refreshes.
-- Sound and music must work on phones too, including an iPhone with its
-  silent switch on.
-
-Peppa
-- Subtly alive: she breathes, blinks and wags her tail, and hops with
-  swinging legs when she walks.
-- After a splash she cheers with her arms up and gets mud spots that fade by
-  the next puddle.
-- In rain, storms and snow she looks up at the sky now and then.
-
-Background
-- A soft parallax landscape behind the field: hazy far hills, a nearer
-  horizon with a few trees, and grass tufts and flowers. When Peppa walks,
-  the layers slide slightly, far ones least.
-- It is generated, so every game and every new round looks a little
-  different; a new landscape cross-fades in.
-
-Weather
-- It moves one step per puddle, never mid-move. Round 1: sunny, cloudy, light
-  rain, thunderstorm, rainbow. Round 2: sunny, cloudy, snow, snow, cloudy.
-- Each change fades slowly: sky and grass colour, clouds over the sun, rain
-  or snowflakes over the field (not over the arrows), and a soft rainbow.
-- Thunder must be safe for young eyes and ears: never a flash, just a soft
-  glow in the sky, a faint cartoon bolt, and a quiet, deep, far-away rumble.
-- Snow turns the field a soft blue-white (not glaring white), with slow
-  drifting flakes and frosted hills and trees.
-
-Splash
-- Always subtle and timed to her landing: the puddle squishes, ripples spread
-  out, and mud drops arc up and fall back.
-- It suits the weather. Cloudy: a darker puddle and a few more drops. Rain:
-  a fuller puddle with raindrop rings on it, and a bigger, wetter splash.
-  Storm: like rain. Rainbow: a faint rainbow sheen, and some drops twinkle
-  in rainbow colours. Snow: some of the drops are snow.
-
-Sound and music
-- Every sound is soft and gentle, never harsh or buzzy.
-- No speech or computer voices at all: they sound robotic. Use chimes,
-  music and Peppa's own gestures instead.
-- Cheerful background music that reacts to the game: calmer while waiting,
-  bouncier while Peppa walks, twinkly when she is one step from the puddle.
-  It changes key after each puddle, plays a small fanfare after each round,
-  and adds a soft beat in level 2.
-- The music suits the weather: slower and softer when cloudy, dreamy with
-  raindrop plinks in the rain, gently minor and muffled in the storm, bright
-  with a harp run for the rainbow, and slow and twinkly with bell-like chimes
-  and a falling celesta run for snow.
-- Sound effects are in the music's key.
-- A small music on/off button that responds only to the mouse or touch.
-
-Finish with a short explanation of how the game works, for a parent.
+Finish with a short explanation, for a parent, of how the game works and what
+you added.
 ```

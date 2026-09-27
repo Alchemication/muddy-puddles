@@ -18,6 +18,8 @@ The selection page has its own friendly background tune, which starts on the fir
 
 ## The Claude Opus 5.5 version
 
+This first version was built step by step in conversation, not in a single shot, and it inspired the prompt. It goes well beyond what the prompt asks for. The prompt now leaves the details to each model.
+
 ### Gameplay
 - **Level 1:** a single row, so only ◀ ▶ are needed.
 - **Level 2:** after 5 puddles the field grows to 3 rows, and ▲ ▼ join in.
