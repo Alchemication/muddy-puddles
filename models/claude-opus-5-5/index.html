@@ -92,6 +92,8 @@
     .cloud { animation: none; }
     .raindrop { animation-duration: 4s; }
     .flake { animation-duration: 30s !important; }
+    #peppa.finale, #bigmud { transition: none; }
+    .splat, #end { animation: none; }
   }
 
   /* ---------- Weather ----------
@@ -209,6 +211,9 @@
   #peppa .head { transform-origin: 40% 100%; transition: transform .6s; }
   #peppa .mud { opacity: 0; transition: opacity 2.5s; }
   #peppa.muddy .mud { opacity: .9; transition: opacity .2s; }
+  /* The finale: mud all over, head and arms too, until the next game. */
+  #peppa:not(.supermuddy) .mud.more { opacity: 0; }
+  #peppa.supermuddy .mud { opacity: .95; transition: opacity .2s; }
   /* Walking: a small hop and swinging legs. */
   #peppa.walking .alive { animation: hop .35s ease-out; }
   #peppa.walking .leg.front { animation: swing .35s ease-in-out; }
@@ -225,7 +230,7 @@
   #peppa.bump .bounce { animation: wiggle .35s ease-in-out; }
 
   /* Splash: the puddle squishes, ripples spread out, mud drops arc up and fall back. */
-  #puddle.squish svg { animation: squish .45s ease-out; transform-origin: 50% 60%; }
+  #puddle.squish svg, #bigmud.squish svg { animation: squish .45s ease-out; transform-origin: 50% 60%; }
   /* The puddle follows the weather: darker when cloudy, fuller in the rain,
      a faint rainbow sheen after it. */
   #puddle .water { transform-box: fill-box; transform-origin: 50% 50%; transition: transform 3s; }
@@ -282,6 +287,35 @@
   .key[data-dir="right"] { grid-area: right; }
   .key.on { background: var(--key-on); transform: translateY(.6vw); box-shadow: 0 .1vw 0 var(--key-edge); }
   .key.off { opacity: .25; }
+  /* ---------- The end: a super-muddy finale, then "Play again" ---------- */
+  .tile { transition: background-color 3s, opacity 1s; }
+  #field.finale .tile { opacity: 0; }
+  #peppa.finale { transition: left 1.2s ease-in-out, top 1.2s ease-in-out, width 1.2s ease-in-out, height 1.2s ease-in-out; }
+  #bigmud {
+    position: absolute; z-index: 1; pointer-events: none;
+    opacity: 0; transform: scale(.3);
+    transition: opacity .8s, transform 1.4s cubic-bezier(.3, 1.3, .5, 1);
+  }
+  #bigmud.on { opacity: 1; transform: scale(1); }
+  #bigmud svg, .splat svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .splat { position: absolute; z-index: 1; pointer-events: none; animation: plop .5s ease-out both; }
+  #muck { position: fixed; inset: 0; z-index: 10; pointer-events: none; }
+  #muck .splat { position: absolute; }
+  #end { display: none; flex-direction: column; align-items: center; gap: 2.5vh; animation: fadein 1.2s ease-out both; }
+  #keys.done .pad { display: none; }
+  #keys.done #end { display: flex; }
+  #time { font-size: 1.8vw; opacity: .55; }
+  #again {
+    border: none; border-radius: 2vw; padding: 1.6vw 2.4vw; cursor: pointer;
+    background: var(--pink); color: #fff; font: inherit; font-size: 2.4vw; font-weight: bold;
+    box-shadow: 0 .7vw 0 var(--pink-dark);
+    display: flex; flex-direction: column; align-items: center; gap: .4vw;
+  }
+  #again .icon { font-size: 5vw; line-height: 1; }
+  #again:active { transform: translateY(.5vw); box-shadow: 0 .2vw 0 var(--pink-dark); }
+  @keyframes plop { 0% { transform: scale(.2); opacity: 0; } 60% { transform: scale(1.08); } 100% { transform: scale(1); } }
+  @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+
   .key.hint { animation: hint 1s ease-in-out infinite; }
   .key.hint.call { animation: call .5s ease-in-out 2, hint 1s ease-in-out 1s infinite; }
 
@@ -305,6 +339,9 @@
     }
     .key { border-radius: 4vw; font-size: 10vw; box-shadow: 0 1.5vw 0 var(--key-edge); }
     .key.on { transform: translateY(1.2vw); }
+    #time { font-size: 4vw; }
+    #again { font-size: 5.5vw; border-radius: 5vw; padding: 3vw 8vw; box-shadow: 0 1.5vw 0 var(--pink-dark); }
+    #again .icon { font-size: 11vw; }
   }
 
   @keyframes jump {
@@ -389,6 +426,12 @@
           </g>
         </svg>
       </div>
+      <div id="bigmud">
+        <svg viewBox="0 0 200 70" preserveAspectRatio="none">
+          <ellipse cx="100" cy="37" rx="97" ry="31" fill="var(--mud)"/>
+          <ellipse cx="78" cy="28" rx="42" ry="8" fill="var(--mud-light)" opacity=".7"/>
+        </svg>
+      </div>
       <div id="peppa">
         <div class="bounce"><div class="flip"><div class="alive">
           <svg viewBox="0 0 200 230">
@@ -416,6 +459,11 @@
               <circle cx="104" cy="182" r="3.5"/><circle cx="142" cy="178" r="3"/>
               <circle cx="80" cy="213" r="4"/><circle cx="127" cy="214" r="4.5"/>
             </g>
+            <!-- more mud for the finale -->
+            <g class="mud more" fill="var(--mud)">
+              <circle cx="96" cy="140" r="6"/><circle cx="72" cy="150" r="4"/><circle cx="124" cy="150" r="5"/>
+              <circle cx="112" cy="126" r="3.5"/><circle cx="46" cy="115" r="3.5"/><circle cx="156" cy="116" r="3.5"/>
+            </g>
             <g class="head">
               <ellipse cx="66" cy="28" rx="10" ry="18" fill="var(--pink)" stroke="var(--pink-dark)" stroke-width="3" transform="rotate(-20 66 28)"/>
               <ellipse cx="90" cy="20" rx="10" ry="18" fill="var(--pink)" stroke="var(--pink-dark)" stroke-width="3" transform="rotate(5 90 20)"/>
@@ -431,6 +479,10 @@
               </g>
               <circle cx="74" cy="84" r="11" fill="var(--pink-dark)" opacity=".8"/>
               <path d="M104 88 Q122 100 140 80" fill="none" stroke="#b81d23" stroke-width="4" stroke-linecap="round"/>
+              <g class="mud more" fill="var(--mud)">
+                <circle cx="82" cy="58" r="7"/><circle cx="62" cy="70" r="4"/><circle cx="106" cy="100" r="4.5"/>
+                <circle cx="88" cy="26" r="3.5"/><circle cx="160" cy="36" r="3"/>
+              </g>
             </g>
           </svg>
         </div></div></div>
@@ -443,13 +495,18 @@
         <button class="key" data-dir="down" aria-label="Down">▼</button>
         <button class="key" data-dir="right" aria-label="Right">▶</button>
       </div>
+      <div id="end">
+        <div id="time"></div>
+        <button id="again" tabindex="-1"><span class="icon">🐷</span>Play again</button>
+      </div>
     </div>
   </div>
 </div>
+<div id="muck"></div>
 
 <script>
 (() => {
-  const PUDDLES_PER_ROUND = 5;
+  const PUDDLES_PER_ROUND = 5, ROUNDS = 2; // the game ends after the last round
   const HINT_AFTER_MS = 4000;
   const DIRS = {
     ArrowLeft:  { name: "left",  dx: -1, dy: 0 },
@@ -460,7 +517,7 @@
   const byName = Object.fromEntries(Object.values(DIRS).map(d => [d.name, d]));
 
   const $ = s => document.querySelector(s);
-  const field = $("#field"), peppa = $("#peppa"), puddle = $("#puddle");
+  const field = $("#field"), peppa = $("#peppa"), puddle = $("#puddle"), bigmud = $("#bigmud");
   const message = $("#message"), stars = $("#stars");
 
   // ---------- Weather ----------
@@ -540,7 +597,8 @@
   const keyEls = Object.fromEntries([...document.querySelectorAll(".key")].map(k => [k.dataset.dir, k]));
 
   // Level 1: one row, only left/right. Level 2: three rows, all four arrows.
-  const state = { level: 1, cols: 5, rows: 1, x: 0, y: 0, px: 4, py: 0, score: 0, busy: false, started: false };
+  const state = { level: 1, cols: 5, rows: 1, x: 0, y: 0, px: 4, py: 0, score: 0, busy: false, started: false,
+    startTime: 0, endTime: 0, finished: false, ready: false };
   let cell = 0, offX = 0, offY = 0, hintTimer = null, walkTimer = null;
 
   // ---------- Sound ----------
@@ -632,6 +690,16 @@
     // End of a round: a longer run up two octaves.
     fanfare: () => [60, 64, 67, 72, 76, 79, 84].forEach((m, i) =>
       note(hz(m + musicKey), { dur: i === 6 ? 1.2 : 0.4, vol: 0.12, at: i * 0.09 })),
+    // The very end: a bouncy little "muddy puddle dance" over a soft bass.
+    finale: () => {
+      let t = 0;
+      [[12,.5],[16,.5],[19,.5],[24,1],[19,.5],[24,.5],[28,.5],[31,.5],[28,.5],[24,2]].forEach(([n, beats]) => {
+        note(hz(60 + musicKey + n - 12), { dur: 0.5, vol: 0.12, at: t });
+        t += beats * 0.26;
+      });
+      [[0, 0], [5, 1.04], [7, 2.08], [0, 3.12]].forEach(([n, at]) =>
+        note(hz(36 + musicKey + n), { dur: 1, type: "triangle", vol: 0.12, at }));
+    },
   };
 
   // ---------- Background music ----------
@@ -1079,6 +1147,7 @@
     peppa.style.transition = "none";
     place(peppa, state.x, state.y, 0.85);
     place(puddle, state.px, state.py, 0.9);
+    if (state.finished) placeFinale();
     peppa.offsetWidth; // flush so the next move animates
     peppa.style.transition = "";
     keyEls.up.classList.toggle("off", state.rows === 1);
@@ -1109,6 +1178,7 @@
 
   function move(d) {
     if (state.busy) return;
+    if (!state.startTime) state.startTime = Date.now(); // the clock starts with the first key
     flash(d.name);
     resetHint();
     wrongPresses = 0;
@@ -1146,6 +1216,7 @@
     setTimeout(sfx.oink, 700);
     message.textContent = "Splash! Hooray! 🎉";
     state.score++;
+    if (state.score === PUDDLES_PER_ROUND * ROUNDS) state.endTime = Date.now();
     changeKey();
     const s = document.createElement("span");
     s.className = "star"; s.textContent = "⭐";
@@ -1160,16 +1231,13 @@
   }
 
   function roundDone() {
+    if (state.level === ROUNDS) return finale();
     sfx.fanfare();
     stars.textContent = "";
-    if (state.level === 1) {
-      state.level = 2; state.rows = 3;
-      beat = 0.38;
-      state.y = 1; state.py = 1;
-      message.textContent = "Now up ▲ and down ▼ too!";
-    } else {
-      message.textContent = "Well done! 🌈";
-    }
+    state.level = 2; state.rows = 3;
+    beat = 0.38;
+    state.y = 1; state.py = 1;
+    message.textContent = "Now up ▲ and down ▼ too!";
     sceneSeed = Math.floor(Math.random() * 1e9); // a new landscape for the new round
     sceneFade = true;
     layout();
@@ -1197,11 +1265,12 @@
   };
   const RAINBOW = ["#ff9a9a", "#ffc27a", "#fff38a", "#8fd694", "#7cc0ff", "#c39bff"];
 
-  function splashEffect() {
+  // `target` is the puddle to splash in, `unit` sets the size of the drops.
+  function splashEffect(target = puddle, unit = cell) {
     const kind = SPLASH[document.body.dataset.weather] || SPLASH.sunny;
-    const r = puddle.getBoundingClientRect(), f = field.getBoundingClientRect();
+    const r = target.getBoundingClientRect(), f = field.getBoundingClientRect();
     const cx = r.left - f.left + r.width / 2, cy = r.top - f.top + r.height * 0.55;
-    replay(puddle, "squish");
+    replay(target, "squish");
     peppa.classList.add("muddy");
     replay(peppa, "cheer");
     // Soft ripples, one just after the other.
@@ -1209,7 +1278,7 @@
       spawnAt("ripple", r.width * 0.9 * kind.spread, r.height * 0.45 * kind.spread, cx, cy, 1000), i * 180);
     // A crown of mud drops that arc up and fall back down.
     for (let i = 0; i < kind.drops; i++) {
-      const size = cell * (0.04 + Math.random() * 0.05);
+      const size = unit * (0.04 + Math.random() * 0.05);
       const side = i % 2 ? 1 : -1;
       const d = spawnAt("drop", size, size, cx + side * r.width * 0.2, cy, 800);
       if (kind.wet && i % 3 === 0) d.classList.add("wet");
@@ -1218,18 +1287,125 @@
         d.classList.add("rainbow");
         d.style.background = d.style.color = RAINBOW[(i / 2) % RAINBOW.length];
       }
-      d.style.setProperty("--dx", side * cell * (0.15 + Math.random() * 0.35) * kind.spread + "px");
-      d.style.setProperty("--up", -cell * (0.25 + Math.random() * 0.3) * kind.height + "px");
-      d.style.setProperty("--fall", cell * 0.05 + "px");
+      d.style.setProperty("--dx", side * unit * (0.15 + Math.random() * 0.35) * kind.spread + "px");
+      d.style.setProperty("--up", -unit * (0.25 + Math.random() * 0.3) * kind.height + "px");
+      d.style.setProperty("--fall", unit * 0.05 + "px");
     }
     if (kind.rainbow)
       for (let i = 0; i < 3; i++) setTimeout(() => {
-        const t = spawnAt("twinkle", cell * 0.18, cell * 0.18,
+        const t = spawnAt("twinkle", unit * 0.18, unit * 0.18,
           cx + (Math.random() - 0.5) * r.width, cy - r.height * (0.4 + Math.random() * 0.6), 900);
-        t.style.fontSize = cell * 0.16 + "px";
+        t.style.fontSize = unit * 0.16 + "px";
         t.textContent = "✨";
       }, 150 + i * 150);
   }
+
+  // ---------- The end: a super-muddy finale ----------
+  // After the last puddle the grid fades away, one giant puddle grows in the
+  // middle, and Peppa jumps into it three times. Mud lands all over the field
+  // (and a little on the screen), and she ends up muddy from head to toe.
+  // Then the time it took appears, quietly, with a "Play again" button.
+  function placeFinale() {
+    const w = field.clientWidth, h = field.clientHeight;
+    const size = Math.min(w * 0.36, h * 0.52);
+    const mw = Math.min(w * 0.85, size * 2.3), mh = mw * 0.34;
+    const feet = Math.min(h * 0.5 + size * 0.45, h - mh * 0.55);
+    Object.assign(peppa.style, { width: size + "px", height: size + "px", left: (w - size) / 2 + "px", top: feet - size * 0.93 + "px" });
+    Object.assign(bigmud.style, { width: mw + "px", height: mh + "px", left: (w - mw) / 2 + "px", top: feet - mh * 0.5 + "px" });
+  }
+
+  // A mud splat: a round blob with a few drops around it.
+  function splat(parent, x, y, size, opacity = 0.9) {
+    const pt = (a, d) => [50 + Math.cos(a) * d, 50 + Math.sin(a) * d];
+    const fill = Math.random() < 0.5 ? "var(--mud)" : "var(--mud-light)";
+    let body = `<circle cx="50" cy="50" r="${24 + Math.random() * 6}"/>`;
+    for (let i = 0, a0 = Math.random() * 6; i < 4; i++) {
+      const [lx, ly] = pt(a0 + i * 1.6, 20), [dx, dy] = pt(a0 + i * 1.6 + 0.7, 38 + Math.random() * 8);
+      body += `<circle cx="${lx}" cy="${ly}" r="${12 + Math.random() * 6}"/><circle cx="${dx}" cy="${dy}" r="${3 + Math.random() * 3}"/>`;
+    }
+    const el = document.createElement("div");
+    el.className = "splat";
+    Object.assign(el.style, { width: size + "px", height: size + "px", left: x - size / 2 + "px", top: y - size / 2 + "px", opacity });
+    el.innerHTML = `<svg viewBox="0 0 100 100" style="fill: ${fill}; transform: rotate(${Math.random() * 360}deg)">${body}</svg>`;
+    parent.append(el);
+    // Keep the number of splats in check when the splashing goes on and on.
+    const all = parent.querySelectorAll(".splat");
+    if (all.length > 40) all[0].remove();
+  }
+  function muddySplash(count) {
+    const w = field.clientWidth, h = field.clientHeight, unit = peppa.clientWidth;
+    sfx.splash();
+    splashEffect(bigmud, unit);
+    peppa.classList.add("supermuddy");
+    for (let i = 0; i < count; i++) setTimeout(() =>
+      splat(field, Math.random() * w, h * (0.1 + Math.random() * 0.85), unit * (0.12 + Math.random() * 0.2)), 250 + i * 70);
+  }
+
+  function formatTime(ms) {
+    const secs = Math.max(1, Math.round(ms / 1000)), m = Math.floor(secs / 60), s = secs % 60;
+    return "⏱ " + (m ? `${m} min ${s} s` : `${s} s`);
+  }
+
+  function finale() {
+    state.finished = true;
+    stopMusic();
+    sfx.fanfare();
+    message.textContent = "Super muddy puddle! 🐷";
+    field.classList.add("finale");
+    peppa.classList.remove("muddy", "left");
+    peppa.classList.add("finale");
+    bigmud.classList.add("on");
+    placeFinale();
+    replay(peppa, "walking");
+    // Three big jumps, each landing with a bigger splash.
+    [1500, 2700, 3900].forEach((at, i) => {
+      setTimeout(() => replay(peppa, "jump"), at);
+      setTimeout(() => {
+        muddySplash(4 + i * 3);
+        if (i === 2) [[6, 12], [92, 8], [7, 86], [90, 82]].forEach(([x, y]) =>
+          splat($("#muck"), innerWidth * (x + Math.random() * 4 - 2) / 100, innerHeight * (y + Math.random() * 4 - 2) / 100,
+            Math.min(innerWidth, innerHeight) * (0.1 + Math.random() * 0.06), 0.85));
+      }, at + 400);
+      setTimeout(sfx.oink, at + 700);
+    });
+    setTimeout(() => { if (musicOn) sfx.finale(); }, 5000);
+    setTimeout(() => {
+      $("#time").textContent = formatTime(state.endTime - state.startTime);
+      $("#keys").classList.add("done");
+      state.ready = true;
+    }, 6400);
+    // The usual music comes back once the dance has finished.
+    setTimeout(() => { if (musicOn && soundOn) startMusic(); }, 8500);
+  }
+
+  // After the finale, arrows and swipes still make Peppa jump in the big puddle.
+  let muddyJumping = false;
+  function muddyJump() {
+    if (!state.ready || muddyJumping) return;
+    muddyJumping = true;
+    replay(peppa, "jump");
+    setTimeout(() => muddySplash(2), 400);
+    if (Math.random() < 0.4) setTimeout(sfx.oink, 700);
+    setTimeout(() => { muddyJumping = false; }, 800);
+  }
+
+  function restart() {
+    Object.assign(state, { level: 1, rows: 1, x: 0, y: 0, score: 0, busy: false,
+      startTime: 0, endTime: 0, finished: false, ready: false });
+    beat = 0.42;
+    $("#keys").classList.remove("done");
+    field.classList.remove("finale");
+    bigmud.classList.remove("on");
+    peppa.classList.remove("finale", "supermuddy", "muddy", "left");
+    document.querySelectorAll(".splat").forEach(s => s.remove());
+    stars.textContent = "";
+    setWeather();
+    sceneSeed = Math.floor(Math.random() * 1e9);
+    sceneFade = true;
+    layout();
+    newPuddle();
+  }
+  $("#again").addEventListener("click", restart);
 
   // While it rains, tiny raindrop rings appear on the puddle's surface.
   setInterval(() => {
@@ -1289,6 +1465,7 @@
     e.preventDefault();
     if (e.repeat) return; // holding a key down shouldn't zoom Peppa across the field
     const d = DIRS[e.key];
+    if (state.finished) { if (d || e.key === " ") muddyJump(); return; }
     if (d) {
       go(d);
     } else if (e.key === " ") {
@@ -1299,6 +1476,7 @@
   });
   // An arrow key or a swipe. Up/down in level 1 counts as a wrong move.
   function go(d) {
+    if (state.finished) return muddyJump();
     if (d.dy && state.rows === 1) { flash(d.name); nudge(); return; }
     move(d);
   }
@@ -1308,7 +1486,7 @@
   const SWIPE_MIN = 30; // px
   let swipeStart = null;
   document.addEventListener("pointerdown", e => {
-    if (!state.started || e.target.closest(".key, #music")) return;
+    if (!state.started || e.target.closest(".key, #music, #again")) return;
     swipeStart = { x: e.clientX, y: e.clientY };
   });
   document.addEventListener("pointerup", e => {

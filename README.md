@@ -32,6 +32,7 @@ Tagged **optimised**. This first version was built step by step in conversation,
 ### Gameplay
 - **Level 1:** a single row, so only ◀ ▶ are needed.
 - **Level 2:** after 5 puddles the field grows to 3 rows, and ▲ ▼ join in.
+- **The end:** after 5 more puddles the game finishes with a super-muddy finale. The grid fades away, a giant puddle grows in the middle, and Peppa jumps in three times. Mud lands all over the field and a little on the screen, and she ends up muddy from head to toe. Then a small, faint clock shows how long it took, from the first key press to the last puddle, next to a **Play again** button. The button only responds to a click or tap, so key-mashing can't restart the game. Until then, arrows and swipes keep Peppa splashing in the big puddle.
 - There's no way to lose. Bumping into an edge makes Peppa wiggle, and holding a key down moves her only one step.
 - **Space** makes Peppa jump and oink.
 

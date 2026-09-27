@@ -11,6 +11,10 @@ The idea
   puddles. Each puddle is a small celebration, then a new one appears.
 - Start with just left and right, and add up and down once my child is ready.
 - It also works on phones and tablets by swiping.
+- The game has an end; it doesn't go on forever. After the last puddle,
+  finish with a big, super-muddy celebration, and quietly show how long it
+  took (just for fun, never a score to beat). When the celebration is over,
+  show a button to play again.
 
 Must-haves
 - Large, simple and clear. No way to lose, and no time pressure.
