@@ -39,19 +39,18 @@
   #models a:hover, #models a:focus-visible { background: var(--focus); transform: translateY(-4px); }
   .pig { font-size: 36px; line-height: 1; }
   .name { font-size: 22px; font-weight: bold; }
-  #music {
-    position: fixed; top: 16px; right: 16px;
-    font: inherit; font-size: 18px; padding: 10px 18px;
-    border: none; border-radius: 999px; cursor: pointer;
-    background: var(--card); color: var(--text); box-shadow: 0 4px 0 var(--card-edge);
+  /* How the game was made: single-shot (one prompt) or optimised (refined in follow-ups). */
+  .tag {
+    display: inline-block; margin-top: 4px; padding: 2px 10px; border-radius: 999px;
+    font-size: 13px; font-weight: bold; white-space: nowrap;
   }
-  #music.on { background: var(--pink); }
+  .tag.single-shot { background: #dff0ff; color: #2d5d85; }
+  .tag.optimised { background: #fde3ee; color: #8a3a5c; }
   footer { text-align: center; margin-top: 6vh; font-size: 16px; }
   footer a { color: var(--text); }
 </style>
 </head>
 <body>
-  <button id="music" tabindex="-1">🎵 Music</button>
   <h1>🐷 Muddy Puddles</h1>
   <p class="sub">Pick a model to play</p>
   <ul id="models"></ul>
@@ -59,8 +58,9 @@
 
 <script>
   // To add a model: put its game in models/<folder>/index.html and add one line here.
+  // tag: "single-shot" (made from the prompt in one go) or "optimised" (refined in follow-ups).
   const MODELS = [
-    { folder: "claude-opus-5-5", name: "Claude Opus 5.5" },
+    { folder: "claude-opus-5-5", name: "Claude Opus 5.5", tag: "optimised" },
   ];
 
   const list = document.getElementById("models");
@@ -68,11 +68,10 @@
     const li = document.createElement("li");
     const a = document.createElement("a");
     a.href = `models/${m.folder}/index.html`;
-    for (const [cls, text] of [["pig", "🐷"], ["name", m.name]]) {
-      const div = document.createElement("div");
-      div.className = cls; div.textContent = text;
-      a.append(div);
-    }
+    const el = (cls, text) => { const d = document.createElement("div"); d.className = cls; d.textContent = text; return d; };
+    const info = document.createElement("div");
+    info.append(el("name", m.name), el(`tag ${m.tag}`, m.tag));
+    a.append(el("pig", "🐷"), info);
     li.append(a);
     list.append(li);
   }
@@ -86,107 +85,7 @@
     if (!step) return;
     e.preventDefault();
     links[(Math.max(i, 0) + step + links.length) % links.length].focus();
-    chime();
   });
-
-  // ---------- Music ----------
-  // A friendly original tune, different from any game's own music.
-  // Browsers only allow sound after a click or key press, so it starts on the first one.
-  let ctx = null, bus = null, timer = null, playing = false, userStopped = false;
-  const hz = m => 440 * 2 ** ((m - 69) / 12);
-  function audio() {
-    if (!ctx) {
-      ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const limiter = ctx.createDynamicsCompressor();
-      const soften = ctx.createBiquadFilter();
-      soften.type = "lowpass"; soften.frequency.value = 3500;
-      bus = ctx.createGain(); bus.gain.value = 0.35;
-      bus.connect(soften).connect(limiter).connect(ctx.destination);
-    }
-    if (ctx.state !== "running") ctx.resume();
-    return ctx;
-  }
-  function note(m, { dur = 0.5, vol = 0.1, type = "sine", at = 0 } = {}) {
-    const a = audio(), o = a.createOscillator(), g = a.createGain(), t = a.currentTime + at;
-    o.type = type; o.frequency.value = hz(m);
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(vol, t + 0.02);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    o.connect(g).connect(bus);
-    o.start(t); o.stop(t + dur + 0.05);
-  }
-  function chime() { if (playing) note(79, { dur: 0.3, vol: 0.06 }); }
-
-  // G major, 8 bars. Melody: [midi note, beats], 0 = rest. One chord per bar.
-  const TUNE = [
-    [[67,1],[71,1],[74,1.5],[71,.5]], [[72,1],[76,1],[74,2]],
-    [[74,1],[72,.5],[71,.5],[69,1],[66,1]], [[67,2],[0,2]],
-    [[71,1],[71,.5],[72,.5],[74,1],[79,1]], [[76,1],[74,1],[72,2]],
-    [[69,1],[71,.5],[72,.5],[74,1],[66,1]], [[67,3],[0,1]],
-  ];
-  const CHORDS = [[43,47,50], [48,52,55], [50,54,57], [43,47,50], [40,43,47], [48,52,55], [50,54,57], [43,47,50]];
-  const BEAT = 0.45;
-  let nextTime = 0, bar = 0, tick = 0; // tick = eighth note in the bar (0-7)
-
-  function schedule() {
-    const a = audio();
-    while (nextTime < a.currentTime + 0.4) {
-      const at = Math.max(0, nextTime - a.currentTime), chord = CHORDS[bar];
-      if (tick === 0) note(chord[0] - 12, { dur: BEAT * 1.8, type: "triangle", vol: 0.13, at });
-      if (tick === 4) note(chord[2] - 12, { dur: BEAT * 1.8, type: "triangle", vol: 0.11, at });
-      if (tick === 2 || tick === 6)
-        chord.forEach(c => note(c + 12, { dur: 0.2, type: "triangle", vol: 0.03, at }));
-      let pos = 0;
-      for (const [m, beats] of TUNE[bar]) {
-        if (pos * 2 === tick && m) {
-          note(m, { dur: 0.6, vol: 0.11, at });
-          note(m + 12, { dur: 0.25, vol: 0.015, at });
-        }
-        pos += beats;
-      }
-      nextTime += BEAT / 2;
-      if (++tick === 8) { tick = 0; bar = (bar + 1) % TUNE.length; }
-    }
-  }
-  // Phones: play sound even when an iPhone's silent switch is on, like video
-  // and music apps do. Newer iPhones have a setting for this; older ones switch
-  // over once a (silent) audio element is playing. Must run during a tap or click.
-  function unlockPhoneAudio() {
-    try { if (navigator.audioSession) { navigator.audioSession.type = "playback"; return; } } catch {}
-    const iOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-    if (!iOS || unlockPhoneAudio.done) return;
-    unlockPhoneAudio.done = true;
-    const rate = 8000, len = rate / 10, buf = new ArrayBuffer(44 + len * 2), v = new DataView(buf);
-    const str = (o, t) => [...t].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
-    str(0, "RIFF"); v.setUint32(4, 36 + len * 2, true); str(8, "WAVEfmt "); v.setUint32(16, 16, true);
-    v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true);
-    v.setUint16(32, 2, true); v.setUint16(34, 16, true); str(36, "data"); v.setUint32(40, len * 2, true);
-    const el = new Audio(URL.createObjectURL(new Blob([buf], { type: "audio/wav" })));
-    el.loop = true; el.setAttribute("playsinline", "");
-    el.play().catch(() => {});
-  }
-  // Phones pause sound when the app is switched away or interrupted; any later
-  // tap or key wakes it up again.
-  const wakeAudio = () => { if (ctx && ctx.state !== "running") ctx.resume(); };
-  ["pointerup", "keydown"].forEach(t => document.addEventListener(t, wakeAudio));
-  const btn = document.getElementById("music");
-  function setMusic(on) {
-    playing = on;
-    btn.classList.toggle("on", on);
-    btn.textContent = on ? "🎵 Music on" : "🎵 Music";
-    clearInterval(timer);
-    if (on) { unlockPhoneAudio(); nextTime = audio().currentTime + 0.1; timer = setInterval(schedule, 100); }
-  }
-  btn.addEventListener("click", () => { userStopped = playing; setMusic(!playing); });
-  // Browsers only allow sound to start on a key press, a mouse press, or a
-  // finger lifting off the screen (not a finger touching down).
-  const startOnFirstTouch = e => {
-    if (e.target === btn || playing || userStopped) return;
-    if (e.type === "pointerdown" && e.pointerType !== "mouse") return;
-    if (e.type === "pointerup" && e.pointerType === "mouse") return;
-    setMusic(true);
-  };
-  ["keydown", "pointerdown", "pointerup"].forEach(t => document.addEventListener(t, startOnFirstTouch));
 </script>
 </body>
 </html>

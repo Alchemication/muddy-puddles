@@ -285,20 +285,6 @@
   .key.hint { animation: hint 1s ease-in-out infinite; }
   .key.hint.call { animation: call .5s ease-in-out 2, hint 1s ease-in-out 1s infinite; }
 
-  /* ---------- Start screen ---------- */
-  #start {
-    position: fixed; inset: 0; z-index: 10;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4vh;
-    background: var(--sky);
-  }
-  #start h1 { font-size: 9vh; margin: 0; }
-  #start button {
-    font: inherit; font-size: 7vh; font-weight: bold;
-    padding: 2vh 7vh; border: none; border-radius: 5vh;
-    background: var(--pink); color: #fff; cursor: pointer;
-    box-shadow: 0 1vh 0 var(--pink-dark);
-  }
-  #start p { font-size: 2.6vh; margin: 0; opacity: .7; text-align: center; max-width: 36em; padding: 0 16px; }
 
   /* ---------- Phones held upright ----------
      The keys move under the field, and sizes follow the screen width. */
@@ -319,9 +305,6 @@
     }
     .key { border-radius: 4vw; font-size: 10vw; box-shadow: 0 1.5vw 0 var(--key-edge); }
     .key.on { transform: translateY(1.2vw); }
-    #start h1 { font-size: 10vw; }
-    #start button { font-size: 9vw; padding: 2vh 10vw; }
-    #start p { font-size: 4vw; padding: 0 6vw; }
   }
 
   @keyframes jump {
@@ -375,13 +358,6 @@
 </style>
 </head>
 <body>
-
-<div id="start">
-  <h1>🐷 Muddy Puddles</h1>
-  <button id="play">▶ Play</button>
-  <p>Use the arrow keys, or swipe on a phone or tablet, to take Peppa to the muddy puddle.
-     Press Esc to leave full screen.</p>
-</div>
 
 <div id="game">
   <div id="sky">
@@ -1309,10 +1285,6 @@
 
   // ---------- Input ----------
   document.addEventListener("keydown", e => {
-    if (!state.started) {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); start(); }
-      return;
-    }
     if (e.metaKey || e.ctrlKey || e.altKey || e.key === "Escape") return;
     e.preventDefault();
     if (e.repeat) return; // holding a key down shouldn't zoom Peppa across the field
@@ -1376,19 +1348,29 @@
   const wakeAudio = () => { if (ctx && ctx.state !== "running") ctx.resume(); };
   ["pointerup", "keydown"].forEach(t => document.addEventListener(t, wakeAudio));
 
-  function start() {
-    if (state.started) return;
-    state.started = true;
-    visitorLoop(4000);
+  // The game opens straight onto the field. Browsers only allow sound after the
+  // first key press or tap, so that first touch also switches on the sound,
+  // the music and full screen (and still moves Peppa as usual).
+  let soundOn = false;
+  function firstTouch(e) {
+    if (soundOn) return;
+    if (e.type === "pointerdown" && e.pointerType !== "mouse") return; // phones: wait for the finger to lift
+    if (e.type === "pointerup" && e.pointerType === "mouse") return;
+    if (e.type === "keydown" && ["Escape", "Meta", "Control", "Alt", "Shift"].includes(e.key)) return;
+    soundOn = true;
     unlockPhoneAudio();
     audio();
-    $("#start").remove();
+    if (e.target.closest?.("#music")) musicOn = false; // the button's own click then turns it on
+    else startMusic();
     document.documentElement.requestFullscreen?.().catch(() => {});
-    layout();
-    startMusic();
+  }
+  ["keydown", "pointerdown", "pointerup"].forEach(t => window.addEventListener(t, firstTouch, true));
+
+  function start() {
+    state.started = true;
+    visitorLoop(4000);
     resetHint();
   }
-  $("#play").addEventListener("click", start);
   $("#music").addEventListener("click", e => {
     musicOn = !musicOn;
     e.currentTarget.classList.toggle("muted", !musicOn);
@@ -1397,6 +1379,7 @@
   window.addEventListener("resize", layout);
   setWeather();
   layout();
+  start();
 })();
 </script>
 </body>

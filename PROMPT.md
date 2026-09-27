@@ -1,6 +1,6 @@
 # The prompt
 
-Every game in this repo is generated from this prompt in a single shot: one message, no follow-ups. The people who play the games do the comparing.
+Games tagged **single-shot** come from this prompt in one message, with no follow-ups. The people who play the games do the comparing.
 
 ```
 Build a Peppa Pig game as a single self-contained HTML file (no external
@@ -26,6 +26,8 @@ Must-haves
 - Sound works on phones too, including an iPhone with its silent switch on.
   Add a music on/off button that only responds to the mouse or touch.
 - Fits any screen, including an upright phone, without scrolling or zooming.
+- Opens straight into the game, with no start screen or Play button. Sound
+  can begin on the first key press or tap.
 - Draw Peppa yourself and compose original music; don't copy the show's
   artwork or theme tune.
 
